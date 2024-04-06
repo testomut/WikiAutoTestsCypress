@@ -5,5 +5,5 @@
 # Cypress
 /cypress/screenshots
 /cypress/videos
-# /cypress/reports
+/cypress/reports
 /cypress/history
