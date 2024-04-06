@@ -15,7 +15,7 @@ describe('Oauth Functionality', () => {
             password: userPassword
         });
         // Verify the user is logged in by checking for a user-specific element
-        authPage.verifySuccessfulLogin(Cypress.env('username'));
+        authPage.verifySuccessfulLogin(userLogin);
     });
 
     it('Fails to log in with incorrect credentials', () => {
