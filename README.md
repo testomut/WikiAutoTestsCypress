@@ -25,9 +25,9 @@ For an illustrative look into the test execution process, video links for each t
 Ensure you have Node.js installed to work with this suite. Follow these steps to set up the testing environment on your local machine:
 
 1. **Clone the Repository**: Get a local copy of the codebase to start running the tests.
-`git clone https://github.com/testomut/WikiAutoTestsCypress`
+ - `git clone https://github.com/testomut/WikiAutoTestsCypress`
 2. **Install Dependencies**: Navigate to the project directory and install the necessary packages.
-`npm install`
+ - `npm install`
 
 ### Running Tests
 
@@ -35,13 +35,6 @@ Execute the tests with predefined npm scripts designed to streamline the testing
 
 - **Run All Tests**: `npm run tests` – Runs the full suite, managing reports automatically.
 - **Individual Test Execution**: Utilize `npx cypress open` for a GUI selection of specific tests.
-
-### Scripts Explained
-
-- `cypress:run` – Executes the test suite.
-- `clean:reports` – Clears and prepares the reports directory for fresh test results.
-- `combine-reports` & `generate-report` – Merges individual test reports into a comprehensive document and generates a user-friendly HTML report.
-- `save-reports` – Archives the reports for historical comparison and review.
 
 ## Resources
 
