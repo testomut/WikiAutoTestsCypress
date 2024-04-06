@@ -1,0 +1,202 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 6,
+    "passes": 6,
+    "pending": 0,
+    "failures": 0,
+    "start": "2024-04-06T08:51:15.750Z",
+    "end": "2024-04-06T08:51:48.281Z",
+    "duration": 32531,
+    "testsRegistered": 6,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "94b83990-57da-4a94-b01e-df3d7e79d7ef",
+      "title": "",
+      "fullFile": "cypress\\e2e\\editing.cy.js",
+      "file": "cypress\\e2e\\editing.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "ff9654e9-6caf-4673-ad8d-ffba231b365b",
+          "title": "Sandbox Editing",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Edits the sandbox by adding text with characters",
+              "fullTitle": "Sandbox Editing Edits the sandbox by adding text with characters",
+              "timedOut": null,
+              "duration": 5077,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\editing.cy.js\"\n}",
+              "code": "sandboxPage.typeText('Saved TexT');\nsandboxPage.saveChanges(editSummary);\nsandboxPage.assertChangesSaved('Saved TexT');",
+              "err": {},
+              "uuid": "9b89483a-75a7-4eb5-bb16-56182298221b",
+              "parentUUID": "ff9654e9-6caf-4673-ad8d-ffba231b365b",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Cancels editing an article",
+              "fullTitle": "Sandbox Editing Cancels editing an article",
+              "timedOut": null,
+              "duration": 3594,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\editing.cy.js\"\n}",
+              "code": "sandboxPage.typeText('Test Cancel');\nsandboxPage.cancelEditing();\nsandboxPage.assertChangesCanceled('Test Cancel');",
+              "err": {},
+              "uuid": "38ce1acb-1f41-4b99-9dd6-7c723daa8a29",
+              "parentUUID": "ff9654e9-6caf-4673-ad8d-ffba231b365b",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Edits the sandbox by adding text with numbers",
+              "fullTitle": "Sandbox Editing Edits the sandbox by adding text with numbers",
+              "timedOut": null,
+              "duration": 4293,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\editing.cy.js\"\n}",
+              "code": "sandboxPage.typeText(`1234567890`);\nsandboxPage.saveChanges(editSummary);\nsandboxPage.assertChangesSaved(`1234567890`);",
+              "err": {},
+              "uuid": "abb79126-cf42-421b-80e1-ac4b014d5a40",
+              "parentUUID": "ff9654e9-6caf-4673-ad8d-ffba231b365b",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Edits the sandbox by adding text with special symbols",
+              "fullTitle": "Sandbox Editing Edits the sandbox by adding text with special symbols",
+              "timedOut": null,
+              "duration": 4377,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\editing.cy.js\"\n}",
+              "code": "sandboxPage.typeText(`&<>\"'=`);\nsandboxPage.saveChanges(editSummary);\nsandboxPage.assertChangesSaved(`&<>\"'=`);",
+              "err": {},
+              "uuid": "b62b3bc9-ce7b-44ae-8c06-0d056cfbfe52",
+              "parentUUID": "ff9654e9-6caf-4673-ad8d-ffba231b365b",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Edits the sandbox without summary",
+              "fullTitle": "Sandbox Editing Edits the sandbox without summary",
+              "timedOut": null,
+              "duration": 5023,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\editing.cy.js\"\n}",
+              "code": "sandboxPage.typeText(uniqueText);\nsandboxPage.saveChanges();\nsandboxPage.assertChangesSaved(uniqueText);",
+              "err": {},
+              "uuid": "354365f8-3f96-4426-bb39-2812327e9d79",
+              "parentUUID": "ff9654e9-6caf-4673-ad8d-ffba231b365b",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Check maximum text length for summary",
+              "fullTitle": "Sandbox Editing Check maximum text length for summary",
+              "timedOut": null,
+              "duration": 9789,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\editing.cy.js\"\n}",
+              "code": "// We don't want to push to \"Publish changes\" button, that's why we type false in the second argument\nsandboxPage.saveChanges(textWith450Symbols, false);\nsandboxPage.assertAvailableRemainingDigits('50');",
+              "err": {},
+              "uuid": "be988638-7851-4c5a-925e-6af61cd139c3",
+              "parentUUID": "ff9654e9-6caf-4673-ad8d-ffba231b365b",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "9b89483a-75a7-4eb5-bb16-56182298221b",
+            "38ce1acb-1f41-4b99-9dd6-7c723daa8a29",
+            "abb79126-cf42-421b-80e1-ac4b014d5a40",
+            "b62b3bc9-ce7b-44ae-8c06-0d056cfbfe52",
+            "354365f8-3f96-4426-bb39-2812327e9d79",
+            "be988638-7851-4c5a-925e-6af61cd139c3"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 32153,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "id": "default",
+        "reportDir": "cypress/reports/mocha",
+        "quite": true,
+        "overwrite": false,
+        "html": false,
+        "json": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}

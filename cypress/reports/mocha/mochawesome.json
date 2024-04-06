@@ -1,0 +1,164 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 4,
+    "passes": 4,
+    "pending": 0,
+    "failures": 0,
+    "start": "2024-04-06T08:50:50.624Z",
+    "end": "2024-04-06T08:51:13.427Z",
+    "duration": 22803,
+    "testsRegistered": 4,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "0845e042-09db-41eb-9a73-a184ea434cb5",
+      "title": "",
+      "fullFile": "cypress\\e2e\\authentication.cy.js",
+      "file": "cypress\\e2e\\authentication.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "0e3c249a-9227-46d3-acc2-1036b351b46d",
+          "title": "Oauth Functionality",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Successfully logs in with correct credentials",
+              "fullTitle": "Oauth Functionality Successfully logs in with correct credentials",
+              "timedOut": null,
+              "duration": 9221,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\authentication.cy.js\"\n}",
+              "code": "authPage.authenticateUser({\n  login: userLogin,\n  password: userPassword\n});\n// Verify the user is logged in by checking for a user-specific element\nauthPage.verifySuccessfulLogin(Cypress.env('username'));",
+              "err": {},
+              "uuid": "08102b1c-dc6d-479f-b43e-3dcc5f0e2ddc",
+              "parentUUID": "0e3c249a-9227-46d3-acc2-1036b351b46d",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Fails to log in with incorrect credentials",
+              "fullTitle": "Oauth Functionality Fails to log in with incorrect credentials",
+              "timedOut": null,
+              "duration": 2714,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\authentication.cy.js\"\n}",
+              "code": "authPage.authenticateUser({\n  login: 'wrongUser',\n  password: 'wrongPassword'\n});\n// Verify login failed by checking for an error message\nauthPage.verifyFailedLogin();",
+              "err": {},
+              "uuid": "14956b53-c7be-4adc-8730-bcd6d499a0b5",
+              "parentUUID": "0e3c249a-9227-46d3-acc2-1036b351b46d",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Fails to log in with correct username and incorrect password",
+              "fullTitle": "Oauth Functionality Fails to log in with correct username and incorrect password",
+              "timedOut": null,
+              "duration": 2779,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\authentication.cy.js\"\n}",
+              "code": "authPage.authenticateUser({\n  login: userLogin,\n  password: 'wrongPassword'\n});\n// Verify that elements specific to logged-in users are present\nauthPage.verifyFailedLogin();",
+              "err": {},
+              "uuid": "f9e00997-6efd-49d4-b20f-593e1043ad2a",
+              "parentUUID": "0e3c249a-9227-46d3-acc2-1036b351b46d",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Successfully logs out",
+              "fullTitle": "Oauth Functionality Successfully logs out",
+              "timedOut": null,
+              "duration": 7906,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\authentication.cy.js\"\n}",
+              "code": "authPage.authenticateUser({\n  login: userLogin,\n  password: userPassword\n});\nauthPage.clickLogoutButton();\n// Verify the user is logged out by checking for the login page\nauthPage.verifyLogout(userLogin);",
+              "err": {},
+              "uuid": "b227d4ad-e81c-4578-b282-cfcde7010a01",
+              "parentUUID": "0e3c249a-9227-46d3-acc2-1036b351b46d",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "08102b1c-dc6d-479f-b43e-3dcc5f0e2ddc",
+            "14956b53-c7be-4adc-8730-bcd6d499a0b5",
+            "f9e00997-6efd-49d4-b20f-593e1043ad2a",
+            "b227d4ad-e81c-4578-b282-cfcde7010a01"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 22620,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "id": "default",
+        "reportDir": "cypress/reports/mocha",
+        "quite": true,
+        "overwrite": false,
+        "html": false,
+        "json": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}

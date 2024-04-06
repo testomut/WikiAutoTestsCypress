@@ -1,0 +1,202 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 6,
+    "passes": 6,
+    "pending": 0,
+    "failures": 0,
+    "start": "2024-04-06T08:52:13.279Z",
+    "end": "2024-04-06T08:52:27.073Z",
+    "duration": 13794,
+    "testsRegistered": 6,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "b412ab07-caaa-45cc-9241-ee275e046ad7",
+      "title": "",
+      "fullFile": "cypress\\e2e\\search.cy.js",
+      "file": "cypress\\e2e\\search.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "ffcf30c8-9e7b-400c-a05d-40c0c1dda8f6",
+          "title": "Article Search",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Searches for an article in English",
+              "fullTitle": "Article Search Searches for an article in English",
+              "timedOut": null,
+              "duration": 1891,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\search.cy.js\"\n}",
+              "code": "wikipediaMainPage.searchFor('Cat');\nwikipediaMainPage.urlShouldInclude('/wiki/Cat');\nwikipediaMainPage.firstHeadingShouldContain('Cat');",
+              "err": {},
+              "uuid": "3aa24b57-badd-4b99-964b-cf1169bc93df",
+              "parentUUID": "ffcf30c8-9e7b-400c-a05d-40c0c1dda8f6",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Searches for an article in a non-English language",
+              "fullTitle": "Article Search Searches for an article in a non-English language",
+              "timedOut": null,
+              "duration": 1729,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\search.cy.js\"\n}",
+              "code": "wikipediaMainPage.searchFor('Кот');\nwikipediaMainPage.pageDoesNotExistMessageShouldExist();",
+              "err": {},
+              "uuid": "f2cbdc02-892c-44ba-8728-850038412f55",
+              "parentUUID": "ffcf30c8-9e7b-400c-a05d-40c0c1dda8f6",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Handles a very long search query",
+              "fullTitle": "Article Search Handles a very long search query",
+              "timedOut": null,
+              "duration": 5393,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\search.cy.js\"\n}",
+              "code": "const longQuery = 'a'.repeat(300);\nwikipediaMainPage.searchFor(longQuery);\nwikipediaMainPage.searchResultsShouldExist();",
+              "err": {},
+              "uuid": "133f05e7-b9c2-4bf4-8593-de4d8cf39d17",
+              "parentUUID": "ffcf30c8-9e7b-400c-a05d-40c0c1dda8f6",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Searches with special characters",
+              "fullTitle": "Article Search Searches with special characters",
+              "timedOut": null,
+              "duration": 1677,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\search.cy.js\"\n}",
+              "code": "wikipediaMainPage.searchFor('%^&*');\nwikipediaMainPage.pageDoesNotExistMessageShouldExist();",
+              "err": {},
+              "uuid": "a151a441-d061-4683-8231-6e5ffef26ff4",
+              "parentUUID": "ffcf30c8-9e7b-400c-a05d-40c0c1dda8f6",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Searches using numbers",
+              "fullTitle": "Article Search Searches using numbers",
+              "timedOut": null,
+              "duration": 1122,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\search.cy.js\"\n}",
+              "code": "wikipediaMainPage.searchFor('12345');\nwikipediaMainPage.urlShouldInclude('/wiki/12345');\nwikipediaMainPage.firstHeadingShouldContain('12345');",
+              "err": {},
+              "uuid": "44c627be-8253-4db3-94c2-e075e6d8af16",
+              "parentUUID": "ffcf30c8-9e7b-400c-a05d-40c0c1dda8f6",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Searches using a mix of letters, numbers, and special characters",
+              "fullTitle": "Article Search Searches using a mix of letters, numbers, and special characters",
+              "timedOut": null,
+              "duration": 1627,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-videos-passed\",\n  \"value\": \"cypress\\\\e2e\\\\search.cy.js\"\n}",
+              "code": "wikipediaMainPage.searchFor('Cats 123!@');\nwikipediaMainPage.searchResultsShouldExist();",
+              "err": {},
+              "uuid": "cf1575c2-2c92-4343-a786-3a91945483cf",
+              "parentUUID": "ffcf30c8-9e7b-400c-a05d-40c0c1dda8f6",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "3aa24b57-badd-4b99-964b-cf1169bc93df",
+            "f2cbdc02-892c-44ba-8728-850038412f55",
+            "133f05e7-b9c2-4bf4-8593-de4d8cf39d17",
+            "a151a441-d061-4683-8231-6e5ffef26ff4",
+            "44c627be-8253-4db3-94c2-e075e6d8af16",
+            "cf1575c2-2c92-4343-a786-3a91945483cf"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 13439,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "id": "default",
+        "reportDir": "cypress/reports/mocha",
+        "quite": true,
+        "overwrite": false,
+        "html": false,
+        "json": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}
