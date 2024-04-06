@@ -14,11 +14,11 @@ The testing suite includes the following specifications, with each test aimed at
 - **Search Functionality (`search.cy.js`)**: Confirms the effectiveness of the search tool in finding relevant articles and information.
 
 For an illustrative look into the test execution process, video links for each test will be provided, highlighting the dynamic testing in action.
-- **Authentication**: [Google Doc](https://drive.google.com/file/d/1HEdLtU9QIPqgfUttVDN5L_xJxsUeF07K/view?usp=drive_link)
-- **Editing**: [Google Doc](https://drive.google.com/file/d/1BsEh6ZodfIkK-gN-B2qoNJTDHyAfdhBd/view?usp=drive_link)
-- **Language Selection**: [Google Doc](https://drive.google.com/file/d/127CzOgqsI49imbDdy5z6L9UZNUkQ3LtI/view?usp=drive_link)
-- **Navigation**: [Google Doc](https://drive.google.com/file/d/1DfTntporm7_srdChKinrzjcqzfxHGb6Z/view?usp=drive_link)
-- **Search Functionality**: [Google Doc](https://drive.google.com/file/d/1b7oyh880acmAFY3SGq0-zXCNIIpF0cLF/view?usp=drive_link)
+- **Authentication**: [authentication.cy.js](https://drive.google.com/file/d/1HEdLtU9QIPqgfUttVDN5L_xJxsUeF07K/view?usp=drive_link)
+- **Editing**: [editing.cy.js](https://drive.google.com/file/d/1BsEh6ZodfIkK-gN-B2qoNJTDHyAfdhBd/view?usp=drive_link)
+- **Language Selection**: [language.cy.js](https://drive.google.com/file/d/127CzOgqsI49imbDdy5z6L9UZNUkQ3LtI/view?usp=drive_link)
+- **Navigation**: [navigation.cy.js](https://drive.google.com/file/d/1DfTntporm7_srdChKinrzjcqzfxHGb6Z/view?usp=drive_link)
+- **Search Functionality**: [search.cy.js](https://drive.google.com/file/d/1b7oyh880acmAFY3SGq0-zXCNIIpF0cLF/view?usp=drive_link)
   
 ## Quick Start
 
@@ -46,7 +46,7 @@ Execute the tests with predefined npm scripts designed to streamline the testing
 ## Resources
 
 - **GitHub Repository**: [WikiAutoTestsCypress](https://github.com/testomut/WikiAutoTestsCypress)
-- **Test Design Document**: [Google Doc](https://docs.google.com/spreadsheets/d/19my7IRcpZLbWiFUoFfTQ4UOh8tItjYjsKIeG1dPXy68/edit?usp=sharing)
+- **Test Design Document**: [AuraWikiCypressTestCases](https://docs.google.com/spreadsheets/d/19my7IRcpZLbWiFUoFfTQ4UOh8tItjYjsKIeG1dPXy68/edit?usp=sharing)
 - **Test Report**: [View Report](https://testomut.github.io/WikiAutoTestsCypress/)
 
 
