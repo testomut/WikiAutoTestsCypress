@@ -13,7 +13,7 @@ The testing suite includes the following specifications, with each test aimed at
 - **Navigation (`navigation.cy.js`)**: Assesses the website's navigational elements for reliability in guiding users through content.
 - **Search Functionality (`search.cy.js`)**: Confirms the effectiveness of the search tool in finding relevant articles and information.
 
-For an illustrative look into the test execution process, video links for each test will be provided, highlighting the dynamic testing in action.
+For an illustrative look into the test execution process, video links for each test will be provided below:
 - **Authentication**: [authentication.cy.js](https://drive.google.com/file/d/1HEdLtU9QIPqgfUttVDN5L_xJxsUeF07K/view?usp=drive_link)
 - **Editing**: [editing.cy.js](https://drive.google.com/file/d/1BsEh6ZodfIkK-gN-B2qoNJTDHyAfdhBd/view?usp=drive_link)
 - **Language Selection**: [language.cy.js](https://drive.google.com/file/d/127CzOgqsI49imbDdy5z6L9UZNUkQ3LtI/view?usp=drive_link)
