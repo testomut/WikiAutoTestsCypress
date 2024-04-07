@@ -24,10 +24,8 @@ For an illustrative look into the test execution process, video links for each t
 
 Ensure you have Node.js installed to work with this suite. Follow these steps to set up the testing environment on your local machine:
 
-1. **Clone the Repository**: Get a local copy of the codebase to start running the tests.
- - `git clone https://github.com/testomut/WikiAutoTestsCypress`
-2. **Install Dependencies**: Navigate to the project directory and install the necessary packages.
- - `npm install`
+1. **Clone the Repository**: `git clone https://github.com/testomut/WikiAutoTestsCypress`
+2. **Install Dependencies**: `npm install`
 
 ### Running Tests
 
