@@ -36,7 +36,7 @@ Execute the tests with predefined npm scripts designed to streamline the testing
 
 ## Resources
 
-- **Test Design Document**: [AuraWikiCypressTestCases](https://docs.google.com/spreadsheets/d/19my7IRcpZLbWiFUoFfTQ4UOh8tItjYjsKIeG1dPXy68/edit?usp=sharing)
+- **Test Design Document**: [WikiCypressTestCases](https://docs.google.com/spreadsheets/d/19my7IRcpZLbWiFUoFfTQ4UOh8tItjYjsKIeG1dPXy68/edit?usp=sharing)
 - **Test Report**: [View Report](https://testomut.github.io/WikiAutoTestsCypress/)
 
 
