@@ -22,7 +22,8 @@ class WikipediaSandboxPage {
    * @param {string} text
    */
   typeText(text) {
-    cy.get('textarea[name="wpTextbox1"]').clear().type(text, { delay: 0 });
+    cy.get('textarea[name="wpTextbox1"]').clear();
+    cy.get('textarea[name="wpTextbox1"]').type(text, { delay: 0 });
   }
 
   /**

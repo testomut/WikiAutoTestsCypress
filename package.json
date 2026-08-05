@@ -14,9 +14,13 @@
   "author": "Stanislav Mokshyn <https://github.com/testomut>",
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "clean": "rimraf cypress/reports cypress/screenshots cypress/videos",
     "pretest": "npm run clean",
     "cypress:open": "cypress open",
@@ -24,13 +28,20 @@
     "test": "npm run cypress:run",
     "test:open": "npm run cypress:open",
     "test:headed": "cypress run --headed",
+    "test:ci": "npm run lint && npm run cypress:run",
     "report": "node -e \"console.log('HTML report: ' + require('path').resolve('cypress/reports/html/index.html'))\""
   },
   "devDependencies": {
-    "cypress": "^13.7.2",
+    "@eslint/js": "^10.0.1",
+    "cypress": "^15.20.0",
+    "eslint": "^10.8.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-cypress": "^6.4.4",
+    "globals": "^17.9.0",
+    "prettier": "^3.9.6",
     "rimraf": "^5.0.5"
   },
   "dependencies": {
-    "cypress-mochawesome-reporter": "^3.8.2"
+    "cypress-mochawesome-reporter": "^5.0.0"
   }
 }

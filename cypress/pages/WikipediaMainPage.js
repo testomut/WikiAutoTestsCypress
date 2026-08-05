@@ -81,6 +81,7 @@ class WikipediaMainPage {
       if (!exists) return;
 
       cy.get('#p-lang-btn-checkbox').click();
+      // eslint-disable-next-line cypress/no-unnecessary-waiting -- see method docblock above: no queryable "menu finished opening" state exists.
       cy.wait(500);
 
       elementExists('.grid.uls-wide').then((menuOpen) => {
@@ -89,7 +90,8 @@ class WikipediaMainPage {
         }
       });
 
-      cy.get('#search input').last().clear().type(languageCode);
+      cy.get('#search input').last().clear();
+      cy.get('#search input').last().type(languageCode);
     });
 
     if (selectLanguage) {
