@@ -1,10 +1,11 @@
-import WikipediaSandboxPage from '../pageObjects/WikipediaSandboxPage';
+import WikipediaSandboxPage from '../pages/WikipediaSandboxPage';
+import { sandboxEditText } from '../fixtures/testData';
 
 describe('Sandbox Editing', () => {
   const sandboxPage = new WikipediaSandboxPage();
-  const uniqueText = `Test ${Date.now()}`; // Generate unique text for each test run
-  const editSummary = 'Cypress test: summary text';
-  const textWith450Symbols = 'abqwertyui'.repeat(45);
+  // Unique per run so repeated executions against the shared, real
+  // Wikipedia:Sandbox page don't collide with a prior run's leftover text.
+  const uniqueText = `Test ${Date.now()}`;
 
   beforeEach(() => {
     sandboxPage.visit();
@@ -12,27 +13,27 @@ describe('Sandbox Editing', () => {
   });
 
   it('Edits the sandbox by adding text with characters', () => {
-    sandboxPage.typeText('Saved TexT');
-    sandboxPage.saveChanges(editSummary);
-    sandboxPage.assertChangesSaved('Saved TexT');
+    sandboxPage.typeText(sandboxEditText.withCharacters);
+    sandboxPage.saveChanges(sandboxEditText.editSummary);
+    sandboxPage.assertChangesSaved(sandboxEditText.withCharacters);
   });
 
   it('Cancels editing an article', () => {
-    sandboxPage.typeText('Test Cancel');
+    sandboxPage.typeText(sandboxEditText.cancelled);
     sandboxPage.cancelEditing();
-    sandboxPage.assertChangesCanceled('Test Cancel');
+    sandboxPage.assertChangesCanceled(sandboxEditText.cancelled);
   });
 
   it('Edits the sandbox by adding text with numbers', () => {
-    sandboxPage.typeText(`1234567890`);
-    sandboxPage.saveChanges(editSummary);
-    sandboxPage.assertChangesSaved(`1234567890`);
+    sandboxPage.typeText(sandboxEditText.numeric);
+    sandboxPage.saveChanges(sandboxEditText.editSummary);
+    sandboxPage.assertChangesSaved(sandboxEditText.numeric);
   });
 
   it('Edits the sandbox by adding text with special symbols', () => {
-    sandboxPage.typeText(`&<>"'=`);
-    sandboxPage.saveChanges(editSummary);
-    sandboxPage.assertChangesSaved(`&<>"'=`);
+    sandboxPage.typeText(sandboxEditText.specialCharacters);
+    sandboxPage.saveChanges(sandboxEditText.editSummary);
+    sandboxPage.assertChangesSaved(sandboxEditText.specialCharacters);
   });
 
   it('Edits the sandbox without summary', () => {
@@ -42,9 +43,9 @@ describe('Sandbox Editing', () => {
   });
 
   it('Check maximum text length for summary', () => {
-    // We don't want to push to "Publish changes" button, that's why we type false in the second argument
-    sandboxPage.saveChanges(textWith450Symbols, false);
-    
-    sandboxPage.assertAvailableRemainingDigits('50');
+    // clickSaveButton=false: we only want the counter to update, not
+    // publish a real edit to the shared sandbox page.
+    sandboxPage.saveChanges(sandboxEditText.longSummary, false);
+    sandboxPage.assertAvailableRemainingDigits(sandboxEditText.remainingCharsAfterLongSummary);
   });
 });

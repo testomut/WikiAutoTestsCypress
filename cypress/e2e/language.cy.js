@@ -1,49 +1,42 @@
-import WikipediaMainPage from '../pageObjects/wikipediaMainPage';
+import WikipediaMainPage from '../pages/WikipediaMainPage';
+import { languageCodes } from '../fixtures/testData';
 
 describe('Change Language Functionality', () => {
-    const wikipediaMainPage = new WikipediaMainPage();
+  const wikipediaMainPage = new WikipediaMainPage();
 
-    beforeEach(() => {
-        wikipediaMainPage.visit();
-    });
+  beforeEach(() => {
+    wikipediaMainPage.visit();
+  });
 
-    it('Switch to a language with a full version of the article', () => {
-        // Spanish
-        wikipediaMainPage.switchLanguage('es');
-        wikipediaMainPage.urlShouldInclude('es');
-    });
+  it('Switch to a language with a full version of the article', () => {
+    wikipediaMainPage.switchLanguage(languageCodes.spanish);
+    wikipediaMainPage.urlShouldInclude(languageCodes.spanish);
+  });
 
-    it('Switch to a language where the article does not exist', () => {
-        // Welsh
-        wikipediaMainPage.switchLanguage('cy', false);
-        wikipediaMainPage.verifyArticleDoesNotExist();
-    });
+  it('Switch to a language where the article does not exist', () => {
+    wikipediaMainPage.switchLanguage(languageCodes.welshNoArticle, false);
+    wikipediaMainPage.verifyArticleDoesNotExist();
+  });
 
-    it('Verify articles availability in most popular languages', () => {
-        // English
-        wikipediaMainPage.switchLanguage('en');
-        wikipediaMainPage.urlShouldInclude('en');
-    
-        // German
-        wikipediaMainPage.switchLanguage('de');
-        wikipediaMainPage.urlShouldInclude('de');
-    
-        // French
-        wikipediaMainPage.switchLanguage('fr');
-        wikipediaMainPage.urlShouldInclude('fr');
-    });
+  it('Verify articles availability in most popular languages', () => {
+    wikipediaMainPage.switchLanguage(languageCodes.english);
+    wikipediaMainPage.urlShouldInclude(languageCodes.english);
 
-    it('Switch to a language and switch back to check if the original context is preserved', () => {
-        // English
-        wikipediaMainPage.switchLanguage('en');
-        wikipediaMainPage.urlShouldInclude('en');
+    wikipediaMainPage.switchLanguage(languageCodes.german);
+    wikipediaMainPage.urlShouldInclude(languageCodes.german);
 
-        // French
-        wikipediaMainPage.switchLanguage('fr');
-        wikipediaMainPage.urlShouldInclude('fr');
+    wikipediaMainPage.switchLanguage(languageCodes.french);
+    wikipediaMainPage.urlShouldInclude(languageCodes.french);
+  });
 
-        // returns to English
-        wikipediaMainPage.switchLanguage('en');
-        wikipediaMainPage.urlShouldInclude('en');
-    });
+  it('Switch to a language and switch back to check if the original context is preserved', () => {
+    wikipediaMainPage.switchLanguage(languageCodes.english);
+    wikipediaMainPage.urlShouldInclude(languageCodes.english);
+
+    wikipediaMainPage.switchLanguage(languageCodes.french);
+    wikipediaMainPage.urlShouldInclude(languageCodes.french);
+
+    wikipediaMainPage.switchLanguage(languageCodes.english);
+    wikipediaMainPage.urlShouldInclude(languageCodes.english);
+  });
 });
