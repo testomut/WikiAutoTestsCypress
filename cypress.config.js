@@ -1,6 +1,10 @@
 const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
+  // Forces credential/secret reads through cy.env() (resolved in the
+  // test process) instead of the deprecated, browser-exposed
+  // Cypress.env() - see cypress/utils/env.js.
+  allowCypressEnv: false,
   reporter: 'cypress-mochawesome-reporter',
   reporterOptions: {
     reportDir: 'cypress/reports/html',

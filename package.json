@@ -24,11 +24,15 @@
     "clean": "rimraf cypress/reports cypress/screenshots cypress/videos",
     "pretest": "npm run clean",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run",
+    "cypress:run": "cypress run --spec \"cypress/e2e/stable/**/*.cy.js\"",
+    "cypress:run:external": "cypress run --spec \"cypress/e2e/external/**/*.cy.js\"",
+    "cypress:run:all": "cypress run",
     "test": "npm run cypress:run",
     "test:open": "npm run cypress:open",
-    "test:headed": "cypress run --headed",
-    "test:ci": "npm run lint && npm run cypress:run",
+    "test:headed": "cypress run --spec \"cypress/e2e/stable/**/*.cy.js\" --headed",
+    "test:external": "npm run cypress:run:external",
+    "test:all": "npm run cypress:run:all",
+    "test:ci": "npm run lint && npm run format:check && npm run cypress:run",
     "report": "node -e \"console.log('HTML report: ' + require('path').resolve('cypress/reports/html/index.html'))\""
   },
   "devDependencies": {
