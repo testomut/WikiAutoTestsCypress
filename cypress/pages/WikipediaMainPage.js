@@ -6,11 +6,28 @@ class WikipediaMainPage {
   }
 
   /**
+   * At narrower viewports (including Cypress's default), Wikipedia's
+   * Vector 2022 skin renders the header search box collapsed behind a
+   * `.search-toggle` icon button — the real `#searchInput` exists in
+   * the DOM but its container is `display: none` until that toggle is
+   * clicked. Vector 2022 also duplicates the whole search form in the
+   * sticky header, so the submit button is scoped to `#p-search`
+   * (the primary header's form); an unscoped selector matches both
+   * forms and cy.click() rejects a 2-element subject. Neither of
+   * these was the case when this suite was first written - both
+   * verified against the live markup while diagnosing real failures,
+   * not assumed.
+   *
    * @param {string} term
    */
   searchFor(term) {
-    cy.get('#searchInput').type(term);
-    cy.get('.cdx-search-input .cdx-button').click();
+    cy.get('#searchInput').then(($input) => {
+      if (!$input.is(':visible')) {
+        cy.get('#p-search .search-toggle').click();
+      }
+    });
+    cy.get('#searchInput').should('be.visible').type(term);
+    cy.get('#p-search .cdx-search-input .cdx-button').click();
   }
 
   /**
@@ -43,10 +60,17 @@ class WikipediaMainPage {
   }
 
   /**
+   * Scoped to `#firstHeading` because Vector 2022 now renders a second
+   * `.mw-page-title-main` inside the sticky header's context bar for
+   * the same page title — an unscoped selector matches both and
+   * `have.text` then asserts on their concatenated text (e.g.
+   * 'Main PageMain Page'). Verified against the live markup while
+   * diagnosing a real test failure, not assumed.
+   *
    * @param {string} title
    */
   assertCorrectPageTitle(title) {
-    cy.get('.mw-page-title-main').should('have.text', title);
+    cy.get('#firstHeading .mw-page-title-main').should('have.text', title);
   }
 
   clickOnLogo() {
