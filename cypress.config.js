@@ -7,6 +7,14 @@ module.exports = defineConfig({
     defaultCommandTimeout: 10000,
     video: true,
     screenshotOnRunFailure: true,
+    // Scoped to CI/headless runs only, as a mitigation for the live
+    // en.wikipedia.org site's own transient flakiness (not a
+    // substitute for stable selectors). Interactive `cypress open`
+    // runs never retry, so failures are visible immediately.
+    retries: {
+      runMode: 1,
+      openMode: 0,
+    },
     reporter: 'cypress-mochawesome-reporter',
     reporterOptions: {
       reportDir: 'cypress/reports/html',

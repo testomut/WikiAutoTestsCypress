@@ -28,6 +28,10 @@ class WikipediaAuthenticationPage {
   }
 
   verifyFailedLogin() {
+    // Structural check (URL stays on the login page) plus the copy
+    // check below: the URL assertion alone can't distinguish "wrong
+    // password" from other failure modes, so both are kept.
+    cy.url().should('include', 'Special:UserLogin');
     cy.contains('Incorrect username or password entered.').should('exist');
   }
 
