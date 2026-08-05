@@ -5,6 +5,30 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed — Second-pass focused review (2026-08-06)
+
+- **Doc consistency:** fixed `README.md`'s incorrect "19 `it()`
+  scenarios" claim (real count: 24, matching `FINAL_REVIEW.md`).
+- **Test suite split:** `cypress/e2e/` now has `stable/` (13
+  scenarios, CI-gated) and `external/` (11 scenarios, manually
+  triggered) - see `ARCHITECTURE.md`. `authentication.cy.js` and
+  `editing.cy.js` were split at the `it()` level.
+- **CI:** default workflow now runs only the stable suite; added
+  `cypress-external.yml` (`workflow_dispatch`) for the external suite,
+  documented as informational rather than a quality gate.
+- **Fixed Cypress binary caching:** replaced a manual `actions/cache`
+  step that ran after `npm ci` (and therefore never cached anything)
+  with `cypress-io/github-action@v7`.
+- **Fixed the Cypress 15 `allowCypressEnv` deprecation warning:** added
+  `cypress/utils/env.js`'s `requireEnv()` (uses `cy.env()` inside a
+  hook, with a clear error if a variable is missing) and set
+  `allowCypressEnv: false`.
+- **`npm run test:ci`** now includes `format:check`, not just lint.
+- **Removed** the stale 2024 static report in `docs/` rather than
+  relabeling it.
+- **README trimmed** from ~310 to ~130 lines; detailed rationale moved
+  to `ARCHITECTURE.md`, test-result history stays in `FINAL_REVIEW.md`.
+
 ### Changed — Senior SDET portfolio rework (2026-08-05)
 
 - **Security:** untracked `cypress.env.json` (previously committed
