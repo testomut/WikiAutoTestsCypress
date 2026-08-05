@@ -1,4 +1,5 @@
-import WikipediaMainPage from '../pageObjects/wikipediaMainPage';
+import WikipediaMainPage from '../pages/WikipediaMainPage';
+import { searchQueries } from '../fixtures/testData';
 
 describe('Article Search', () => {
   const wikipediaMainPage = new WikipediaMainPage();
@@ -8,35 +9,34 @@ describe('Article Search', () => {
   });
 
   it('Searches for an article in English', () => {
-    wikipediaMainPage.searchFor('Cat');
-    wikipediaMainPage.urlShouldInclude('/wiki/Cat');
-    wikipediaMainPage.firstHeadingShouldContain('Cat');
+    wikipediaMainPage.searchFor(searchQueries.englishArticle);
+    wikipediaMainPage.urlShouldInclude(`/wiki/${searchQueries.englishArticle}`);
+    wikipediaMainPage.firstHeadingShouldContain(searchQueries.englishArticle);
   });
 
   it('Searches for an article in a non-English language', () => {
-    wikipediaMainPage.searchFor('Кот');
+    wikipediaMainPage.searchFor(searchQueries.nonEnglishArticle);
     wikipediaMainPage.pageDoesNotExistMessageShouldExist();
   });
 
   it('Handles a very long search query', () => {
-    const longQuery = 'a'.repeat(300);
-    wikipediaMainPage.searchFor(longQuery);
+    wikipediaMainPage.searchFor(searchQueries.veryLong);
     wikipediaMainPage.searchResultsShouldExist();
   });
 
   it('Searches with special characters', () => {
-    wikipediaMainPage.searchFor('%^&*');
+    wikipediaMainPage.searchFor(searchQueries.specialCharacters);
     wikipediaMainPage.pageDoesNotExistMessageShouldExist();
   });
 
   it('Searches using numbers', () => {
-    wikipediaMainPage.searchFor('12345');
-    wikipediaMainPage.urlShouldInclude('/wiki/12345');
-    wikipediaMainPage.firstHeadingShouldContain('12345');
+    wikipediaMainPage.searchFor(searchQueries.numeric);
+    wikipediaMainPage.urlShouldInclude(`/wiki/${searchQueries.numeric}`);
+    wikipediaMainPage.firstHeadingShouldContain(searchQueries.numeric);
   });
 
   it('Searches using a mix of letters, numbers, and special characters', () => {
-    wikipediaMainPage.searchFor('Cats 123!@');
+    wikipediaMainPage.searchFor(searchQueries.mixed);
     wikipediaMainPage.searchResultsShouldExist();
   });
 });
