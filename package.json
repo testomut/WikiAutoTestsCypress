@@ -1,28 +1,36 @@
 {
   "name": "wikipedia-cypress-tests",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "cypress:run": "npx cypress run",
-    "clean:reports": "if exist cypress\\reports rmdir /s/q cypress\\reports && mkdir cypress\\reports && mkdir cypress\\reports\\mochareports",
-    "pretest": "npm run clean:reports",
-    "combine-reports": "mochawesome-merge cypress/reports/mocha/*.json > cypress/reports/mochareports/report.json",
-    "generate-report": "marge cypress/reports/mochareports/report.json -f report -o cypress/reports/mochareports",
-    "save-reports": "cp -RT cypress/reports/mochareports cypress/history",
-    "posttest": "npm run combine-reports && npm run generate-report",
-    "tests": "npm run pretest && npm run cypress:run && npm run posttest"
+  "description": "Reference Cypress UI automation framework for Wikipedia: Page Object Model, CI/CD, and Mochawesome reporting.",
+  "keywords": [
+    "cypress",
+    "test-automation",
+    "e2e-testing",
+    "qa-automation",
+    "sdet",
+    "page-object-model",
+    "wikipedia"
+  ],
+  "author": "Stanislav Mokshyn <https://github.com/testomut>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "clean": "rimraf cypress/reports cypress/screenshots cypress/videos",
+    "pretest": "npm run clean",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test": "npm run cypress:run",
+    "test:open": "npm run cypress:open",
+    "test:headed": "cypress run --headed",
+    "report": "node -e \"console.log('HTML report: ' + require('path').resolve('cypress/reports/html/index.html'))\""
+  },
   "devDependencies": {
     "cypress": "^13.7.2",
-    "mochawesome": "^7.1.3",
-    "mochawesome-merge": "^4.3.0"
+    "rimraf": "^5.0.5"
   },
   "dependencies": {
-    "cypress-mochawesome-reporter": "^3.8.2",
-    "cypress-multi-reporters": "^1.6.4"
+    "cypress-mochawesome-reporter": "^3.8.2"
   }
 }

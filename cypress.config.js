@@ -1,25 +1,24 @@
-const { defineConfig } = require("cypress");
+const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
   e2e: {
-    baseUrl: "https://en.wikipedia.org",
+    baseUrl: 'https://en.wikipedia.org',
     pageLoadTimeout: 100000,
     defaultCommandTimeout: 10000,
     video: true,
-    setupNodeEvents(on, config) {
-      
-    },
+    screenshotOnRunFailure: true,
     reporter: 'cypress-mochawesome-reporter',
-    reporter: 'cypress-multi-reporters',
     reporterOptions: {
-      reporterEnabled: 'mochawesome',
-      mochawesomeReporterOptions: {
-        reportDir: 'cypress/reports/mocha',
-        quite: true,
-        overwrite: false,
-        html: false,
-        json: true,
-      },
+      reportDir: 'cypress/reports/html',
+      charts: true,
+      overwrite: true,
+      html: true,
+      json: true,
+      embeddedScreenshots: true,
+      inlineAssets: true,
+    },
+    setupNodeEvents(on) {
+      require('cypress-mochawesome-reporter/plugin')(on);
     },
   },
 });

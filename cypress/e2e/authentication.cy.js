@@ -2,8 +2,8 @@ import WikipediaAuthenticationPage from '../pageObjects/WikipediaAuthenticationP
 
 describe('Oauth Functionality', () => {
     const authPage = new WikipediaAuthenticationPage();
-    const userLogin = Cypress.env('username');
-    const userPassword = Cypress.env('password');
+    const userLogin = Cypress.env('WIKI_USERNAME');
+    const userPassword = Cypress.env('WIKI_PASSWORD');
 
     beforeEach(() => {
         authPage.visitLoginPage();
