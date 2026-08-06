@@ -1,155 +1,66 @@
-# Wikipedia Cypress Automation — Portfolio Project
+# Wikipedia Cypress Tests
 
 [![Cypress Smoke](https://github.com/testomut/WikiAutoTestsCypress/actions/workflows/cypress.yml/badge.svg)](https://github.com/testomut/WikiAutoTestsCypress/actions/workflows/cypress.yml)
-![Cypress](https://img.shields.io/badge/Cypress-15-04C38E?logo=cypress&logoColor=white)
-![Node](https://img.shields.io/badge/Node-%3E%3D22-339933?logo=node.js&logoColor=white)
-![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-This is a **portfolio/reference project**: a Cypress test automation
-codebase built against [en.wikipedia.org](https://en.wikipedia.org) to
-demonstrate architecture and engineering decisions — a real Page
-Object Model, shared utilities, environment-based secrets, CI, and
-documentation that states tradeoffs rather than hiding them. It is not
-a continuous quality-monitoring tool for Wikipedia, and it doesn't try
-to be.
+A Cypress suite built against [en.wikipedia.org](https://en.wikipedia.org). It started as a short technical assignment in 2024 and I've since cleaned it up as a reference project — a page object model, shared DOM helpers, environment-based secrets, and a CI setup that's honest about what it actually checks.
 
-Wikipedia is a real, external system outside this project's control.
-Some of the example scenarios here can be affected by Wikipedia's own
-UI changes, its login/authentication flow, rate limits, and anti-abuse
-mechanisms like CAPTCHA — none of which this project attempts to
-bypass. See [Limitations](#limitations) below.
+Wikipedia is a live site I don't control. A small set of scenarios (navigation) run in CI and stay green — that's what proves the pipeline itself works. The rest of the scenarios (search, authentication, editing, language switching) are kept as examples of the same page object model but aren't part of the CI gate, because their outcome depends on Wikipedia's own UI, login flow, rate limits, and anti-abuse checks (CAPTCHA, email verification) — none of which this project tries to get around. See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for why.
 
-> Started in 2024 as a short technical assignment, then reworked
-> across a few passes — see [`AUDIT.md`](./AUDIT.md) and
-> [`FINAL_REVIEW.md`](./FINAL_REVIEW.md) for that history.
+## Stack
 
-## At a glance
+Cypress 15, JavaScript with JSDoc (no TypeScript at this size — see [`ARCHITECTURE.md`](./ARCHITECTURE.md#why-not-typescript)), ESLint + Prettier, GitHub Actions, `cypress-mochawesome-reporter`.
 
-- **Purpose** — show how a maintainable Cypress suite is put together:
-  Page Object Model, shared DOM helpers instead of copy-pasted
-  workarounds, environment-based secrets, linting/CI, and honest
-  documentation about what does and doesn't work reliably.
-- **Stack** — Cypress 15 · JavaScript + JSDoc (no TypeScript — see
-  [why](./ARCHITECTURE.md#why-not-typescript)) · `cypress-mochawesome-reporter`
-  · ESLint (flat config) + Prettier · GitHub Actions.
-- **Key engineering decisions** — Page Object Model with zero leaked
-  selectors; one reporter, not three; secrets read via `cy.env()` with
-  validation, never committed; the suite split into a tiny
-  [**smoke** suite (CI-gated) and **examples** (manual reference)](#smoke-vs-example-scenarios)
-  so CI proves the pipeline works without depending on Wikipedia
-  staying consistently green. Full rationale in
-  [`ARCHITECTURE.md`](./ARCHITECTURE.md).
-- **CI** — the badge above is the smoke suite only: it installs
-  dependencies, checks lint/formatting, and runs a handful of
-  deterministic tests. It's meant to stay green.
-
-## Quick start
+## Getting started
 
 ```bash
 git clone https://github.com/testomut/WikiAutoTestsCypress.git
 cd WikiAutoTestsCypress
 npm ci
-npm test                # smoke suite, headless - no credentials needed
-npm run cypress:open    # or: interactive, pick a spec
+npm test               # smoke suite, headless, no credentials needed
+npm run cypress:open   # interactive, pick any spec
 ```
 
-Running the example scenarios locally needs a disposable test account
-— see [Environment setup](#environment-setup).
+## Project layout
+
+```
+cypress/
+  e2e/
+    smoke/      # runs in CI on every push
+    examples/   # everything else, run manually
+  pages/        # page objects
+  utils/        # shared DOM helpers, env var handling
+  fixtures/     # test data
+```
 
 ## Commands
 
-| Command                           | What it does                                          |
-| --------------------------------- | ----------------------------------------------------- |
-| `npm test`                        | Smoke suite, headless (cleans previous reports first) |
-| `npm run cypress:open`            | Open the Cypress GUI runner (any spec)                |
-| `npm run test:examples`           | Example scenarios — see below                         |
-| `npm run test:all`                | Every spec, smoke + examples                          |
-| `npm run test:ci`                 | Lint + format check + smoke suite — what CI runs      |
-| `npm run lint` / `lint:fix`       | ESLint                                                |
-| `npm run format` / `format:check` | Prettier                                              |
-| `npm run report`                  | Print the generated Mochawesome HTML report path      |
+| Command | What it does |
+| --- | --- |
+| `npm test` | Smoke suite, headless |
+| `npm run cypress:open` | Interactive runner |
+| `npm run test:examples` | Example scenarios (needs credentials, see below) |
+| `npm run test:all` | Everything |
+| `npm run test:ci` | Lint + format check + smoke suite, what CI runs |
+| `npm run lint`, `npm run format` | ESLint / Prettier |
+| `npm run report` | Print the path to the generated HTML report |
 
-## Smoke vs. example scenarios
+## Credentials
 
-- **`cypress/e2e/smoke/`** — a small set of deterministic tests that
-  run on every push/PR. They exist to prove the pipeline itself works
-  (dependencies install, the Cypress config is valid, lint/formatting
-  pass, a real test executes end-to-end), not to monitor Wikipedia.
-  Needs no credentials.
-- **`cypress/e2e/examples/`** — the rest of the scenarios (search,
-  language switching, authentication, editing), kept as reference
-  implementations of the same Page Object Model. Run manually via
-  `npm run test:examples` or the "Cypress Examples" workflow, not on
-  every push. Some of these currently fail against the live site —
-  documented plainly in [`FINAL_REVIEW.md`](./FINAL_REVIEW.md) rather
-  than hidden or forced green.
-
-See [`ARCHITECTURE.md`](./ARCHITECTURE.md#smoke-vs-example-scenarios)
-for the full reasoning.
-
-## Environment setup
-
-Only needed for the example scenarios — the smoke suite needs no
-credentials. Credentials are read via `cy.env()` with explicit
-validation (see
-[`ARCHITECTURE.md`](./ARCHITECTURE.md#credentials-and-the-cypress-15-env-warning)).
+The example scenarios that touch login need a Wikipedia account. Use a disposable one you don't mind losing — never a personal account, and note that `editing.cy.js` writes real (if trivial) edits to the public `Wikipedia:Sandbox` page.
 
 ```bash
-npm run setup:env   # creates cypress.env.json from cypress.env.example.json
+npm run setup:env   # copies cypress.env.example.json to cypress.env.json
 ```
 
-Then fill in a **disposable test account you don't mind losing** —
-never a personal or production Wikipedia account — in the new
-`cypress.env.json` (gitignored). In CI, use `CYPRESS_`-prefixed
-repository secrets instead — see [`.env.example`](./.env.example) and
-[`SECURITY.md`](./SECURITY.md).
-
-## Running in CI
-
-`.github/workflows/cypress.yml` runs the smoke suite on every
-push/PR: Node 22, cached `npm ci`, lint, format check, then a handful
-of tests. No repository secrets required.
-
-`.github/workflows/cypress-examples.yml` (manual dispatch only) runs
-the example scenarios and needs
-`CYPRESS_WIKI_USERNAME`/`CYPRESS_WIKI_PASSWORD` repository secrets —
-see [`GITHUB_SETUP.md`](./GITHUB_SETUP.md).
+Fill in `cypress.env.json` (gitignored) locally, or set `CYPRESS_WIKI_USERNAME` / `CYPRESS_WIKI_PASSWORD` as GitHub Actions secrets to run the examples workflow from Actions → "Cypress Examples (manual)".
 
 ## Reports
 
-A single reporter (`cypress-mochawesome-reporter`) generates one
-merged HTML report per run at `cypress/reports/html/index.html`, with
-screenshots embedded inline. Locally: `npm test` then `npm run
-report`. In CI: download the `mochawesome-report` artifact.
-
-## Limitations
-
-- This demonstrates test architecture, not production-grade Wikipedia
-  coverage — there's no on-call rotation or SLA behind it, and it
-  isn't meant to guarantee Wikipedia's stability.
-- The example scenarios run against a live, third-party site this
-  project doesn't control. Wikipedia's own UI changes, login flow,
-  rate limiting, and anti-abuse mechanisms (CAPTCHA, email
-  verification) can all affect them, independent of anything in this
-  codebase. None of those are bypassed here.
-- No visual regression, accessibility, or performance testing —
-  functional UI coverage only.
-
-Full detail, including exactly which example scenarios currently pass
-or fail and why, is in [`FINAL_REVIEW.md`](./FINAL_REVIEW.md).
-
-## Documentation
-
-- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — folder structure, layers,
-  design-decision rationale, stability strategy
-- [`FINAL_REVIEW.md`](./FINAL_REVIEW.md) — real test-run results,
-  what's fixed vs. blocked
-- [`AUDIT.md`](./AUDIT.md) — the original pre-rework audit
-- [`SECURITY.md`](./SECURITY.md) · [`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`CHANGELOG.md`](./CHANGELOG.md) · [`GITHUB_SETUP.md`](./GITHUB_SETUP.md)
+`cypress-mochawesome-reporter` writes one merged HTML report per run to `cypress/reports/html/index.html`, screenshots included. Run `npm run report` for the path after a local run; in CI it's uploaded as the `mochawesome-report` artifact.
 
 ## Author
 
-**Stanislav Mokshyn** — [github.com/testomut](https://github.com/testomut)
+Stanislav Mokshyn — [github.com/testomut](https://github.com/testomut)
 
 ## License
 

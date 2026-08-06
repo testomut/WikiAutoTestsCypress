@@ -1,13 +1,11 @@
 import WikipediaMainPage from '../../pages/WikipediaMainPage';
 import { languageCodes } from '../../fixtures/testData';
 
-// EXTERNAL/BLOCKED: the Universal Language Selector widget's markup
-// no longer matches the selectors switchLanguage() expects after
-// clicking the language toggle (confirmed reproducible, root cause
-// not yet diagnosed with live browser DOM inspection - see
-// FINAL_REVIEW.md). Not run in the default CI workflow; run manually
-// via the "Cypress External Suite" workflow or `npm run test:external`.
-describe('Change Language Functionality (external - blocked)', () => {
+// Not part of the CI smoke suite - see ARCHITECTURE.md. These currently
+// fail: Wikipedia's language selector widget doesn't match the
+// selectors switchLanguage() expects after clicking the toggle, and
+// I haven't dug into the live DOM to find the current markup.
+describe('Change Language Functionality', () => {
   const wikipediaMainPage = new WikipediaMainPage();
 
   beforeEach(() => {

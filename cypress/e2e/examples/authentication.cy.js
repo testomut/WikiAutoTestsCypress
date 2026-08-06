@@ -1,14 +1,10 @@
 import WikipediaAuthenticationPage from '../../pages/WikipediaAuthenticationPage';
 import { requireEnv } from '../../utils/env';
 
-// Reference example, not part of the CI smoke suite (see ARCHITECTURE.md).
-// The two successful-login/logout scenarios currently fail: Wikimedia's
-// SSO requires an emailed verification code to complete a login on this
-// account, which this project does not attempt to solve or bypass.
-// Run manually via `npm run test:examples` or the "Cypress Examples"
-// workflow. Needs CYPRESS_WIKI_USERNAME/CYPRESS_WIKI_PASSWORD - see
-// .env.example / SECURITY.md; requireEnv() throws a clear error rather
-// than silently skipping if either is missing.
+// Not part of the CI smoke suite - see ARCHITECTURE.md. The successful
+// login/logout scenarios currently fail because Wikipedia's SSO now
+// asks for an emailed verification code, which isn't handled here.
+// Needs CYPRESS_WIKI_USERNAME/CYPRESS_WIKI_PASSWORD - see .env.example.
 describe('Authentication', () => {
   const authPage = new WikipediaAuthenticationPage();
   let credentials = {};

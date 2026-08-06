@@ -6,20 +6,17 @@ class WikipediaSandboxPage {
   }
 
   /**
-   * Opens the source editor. MediaWiki occasionally shows a one-time
-   * "Start editing" welcome dialog first (depends on account/cookie
-   * state), so the click is routed through the shared optional-dialog
+   * Opens the source editor. MediaWiki sometimes shows a one-time
+   * "Start editing" welcome dialog first, depending on account/cookie
+   * state, so the click goes through the shared optional-dialog
    * helper instead of assuming either outcome. Both the older OOUI
-   * dialog and a newer plain-button "Welcome to Wikipedia" onboarding
-   * dialog observed on this account are matched, since either can
-   * render depending on account history - confirmed by screenshot
-   * while diagnosing a real failure, not assumed.
+   * dialog and a newer plain-button "Welcome to Wikipedia" variant are
+   * matched, since either can render depending on account history.
    *
-   * Note: even with the dialog dismissed, Wikipedia's anti-abuse
-   * system may still challenge the actual publish action for some
-   * accounts (observed: an hCaptcha check triggered after saving) -
-   * this suite does not attempt to solve or bypass that challenge.
-   * See ARCHITECTURE.md "Stability strategy" / FINAL_REVIEW.md.
+   * Even with the dialog dismissed, Wikipedia's anti-abuse system can
+   * still challenge the publish action itself (an hCaptcha check) -
+   * see ARCHITECTURE.md for why this suite doesn't try to work around
+   * that.
    */
   edit() {
     clickThenDismissOptionalDialog(

@@ -1,19 +1,12 @@
 import WikipediaSandboxPage from '../../pages/WikipediaSandboxPage';
 import { sandboxEditText } from '../../fixtures/testData';
 
-// EXTERNAL/BLOCKED: every scenario here can trigger an hCaptcha
-// challenge - not just the ones that submit a save. Confirmed via a
-// real CI run: "Cancels editing an article" (which only types and
-// cancels, never saves) still triggered network calls to
-// hcaptcha.wikimedia.org and /rest.php/v0/confirmedit/hcaptcha/*,
-// visible in that run's screenshot - almost certainly because typing
-// into the editor alone triggers MediaWiki's stashedit autosave API,
-// which is enough to draw the same anti-abuse scrutiny as an actual
-// publish. That challenge is not solved or bypassed here, and appears
-// to gate the rest of that browser session once triggered. Not run in
-// the default CI workflow; run manually via the "Cypress External
-// Suite" workflow or `npm run test:external`.
-describe('Sandbox Editing (external - blocked)', () => {
+// Not part of the CI smoke suite - see ARCHITECTURE.md. Even "Cancels
+// editing" (which never saves) can trigger Wikipedia's hCaptcha check -
+// typing into the editor alone fires MediaWiki's autosave API, which
+// is apparently enough to draw the same anti-abuse scrutiny as a real
+// publish. Not something this project tries to solve or bypass.
+describe('Sandbox Editing', () => {
   const sandboxPage = new WikipediaSandboxPage();
   // Unique per run so repeated executions against the shared, real
   // Wikipedia:Sandbox page don't collide with a prior run's leftover text.
