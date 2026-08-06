@@ -57,16 +57,45 @@ unknown.
 Given that evidence (not a guess about _why_, but a measured fact
 about _where_ the failure reliably occurs), this pass replaced
 `cypress-io/github-action` with a plain `actions/cache` (correctly
-positioned before `npm ci` this time) + `npm ci` + `npx cypress run`.
-This is a mitigation based on the action's 0-for-3 track record on
-this repo's runners vs. plain `npm ci`'s 100% success rate everywhere
-it's been tested (locally, fresh clones, and every prior CI run that
-got far enough to reach the Cypress step) - not a claim about what was
-wrong with the action internally. See
-[`ARCHITECTURE.md`](./ARCHITECTURE.md#ci-caching-and-install-plain-npm-ci-not-an-action)
-for the full writeup, including why a plain `run:` step is also easier
-to debug if it ever fails again (full output visible with no admin
-auth needed).
+positioned before `npm ci` this time) + `npm ci` + `npx cypress run`,
+and pushed it.
+
+### That mitigation did not work - and rules out the codebase entirely
+
+The pushed fix was checked the same way: GitHub Actions run
+[31078439374](https://github.com/testomut/WikiAutoTestsCypress/actions/runs/31078439374)
+on commit `5abd0eb`. **It failed too - at the plain `run: npm ci` step
+itself, in 2 seconds.** This is the single most useful data point in
+this whole investigation: a bare `npm ci`, with no action, no wrapper,
+nothing but Node/npm doing exactly what it does everywhere else,
+fails on this repo's GitHub-hosted runner.
+
+To settle whether the repository content itself could still be at
+fault, `git clone`d a genuinely fresh copy of that exact failing
+commit (`5abd0eb`) into an isolated directory (not this working copy)
+and ran `npm ci` there: **it succeeded** - 296 packages, 0
+vulnerabilities, 6 seconds, identical to every other local run
+throughout this project.
+
+That comparison rules out the codebase as the cause with about as much
+confidence as is achievable from outside GitHub's infrastructure: the
+exact same commit, the exact same lockfile, the exact same `npm ci`
+command succeeds locally and fails on GitHub's runner in 2 seconds
+flat. The remaining explanations are all on GitHub's side of the
+boundary - runner-level network/DNS/registry-access restriction,
+an organization or repository Actions policy, or a GitHub-side
+infrastructure issue - none of which are visible or fixable from a
+local clone, and none of which this project's code, config, or
+workflow YAML can address. Further workflow-file changes were not
+attempted, because there is no more evidence that changing the
+workflow would help; the failure has now survived three different
+technical approaches (an action, a corrected cache step, a bare `npm
+ci`) without changing shape once.
+
+**This needs the actual job log, or a check of the repository/organization's
+Actions settings (Settings → Actions → General, particularly any
+network/allowlist restrictions), by someone with admin access** - not
+another guess from this environment.
 
 ### What was fixed (independent of the above)
 
@@ -127,9 +156,10 @@ suite really is credential-free now, not just in theory.
 
 ### What this pass deliberately did not touch
 
-- Did not guess at the _specific npm error_ behind the install
-  failures - the mitigation above is based on where failures
-  reliably occur, not on an assumed cause.
+- Stopped changing the workflow file after ruling out the codebase
+  itself (fresh-clone `npm ci` test above) - further workflow edits
+  without new evidence would be exactly the guessing the request said
+  not to do.
 - Did not touch `language.cy.js`, the hCaptcha/email-verification
   blockers, or add any new dependency/abstraction - out of scope per
   the request.
