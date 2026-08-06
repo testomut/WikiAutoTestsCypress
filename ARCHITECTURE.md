@@ -72,13 +72,13 @@ reviewers won't clear before giving up. So the split is on two
 combined lines - outcome depends only on this code, **and** needs no
 real credentials:
 
-- **`cypress/e2e/stable/`** (12 scenarios) — needs no Wikipedia
+- **`cypress/e2e/stable/`** (11 scenarios) — needs no Wikipedia
   credentials at all, and its outcome depends only on this code and
   Wikipedia's ordinary page structure. Runs on every push/PR via
   `.github/workflows/cypress.yml`, with no repository secrets
   required. A red run here is a real signal, and the workflow runs
   unmodified on a public fork or clone.
-- **`cypress/e2e/external/`** (12 scenarios) — needs a real Wikipedia
+- **`cypress/e2e/external/`** (13 scenarios) — needs a real Wikipedia
   test account, and/or is currently blocked by the anti-abuse
   mechanisms above or an undiagnosed UI-drift bug. Runs only on manual
   dispatch via `.github/workflows/cypress-external.yml`. A red run
@@ -88,12 +88,18 @@ real credentials:
 
 Where a single original spec file had a mix of both (`authentication`,
 `editing`), it was split at the `it()` level rather than moved
-wholesale. `authentication.cy.js` specifically: its "wrong username
-and wrong password" scenario uses fake literals and needs no secret,
-so it's the only authentication scenario in `stable/`; "correct
-username, wrong password" needs the real username (to be a meaningful
-negative test at all) and moved to `external/` alongside the two
-successful-login/logout scenarios that depend on it. No new spec logic
+wholesale. `authentication.cy.js`: its "wrong username and wrong
+password" scenario uses fake literals and needs no secret, so it's the
+only authentication scenario in `stable/`; "correct username, wrong
+password" needs the real username (to be a meaningful negative test at
+all) and moved to `external/` alongside the two successful-login/
+logout scenarios that depend on it. `editing.cy.js`: none of its
+scenarios stayed in `stable/` - a real CI run showed that even the one
+scenario that never saves ("Cancels editing an article") can still
+trigger the hCaptcha challenge (typing alone triggers MediaWiki's
+`stashedit` autosave API, which draws the same anti-abuse scrutiny as
+an actual publish), so the entire spec lives in `external/`. No new
+spec logic
 was written for this split; scenarios were relocated as-is.
 
 ## Credentials and the Cypress 15 env warning

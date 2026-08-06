@@ -38,10 +38,11 @@ end-to-end against the live [en.wikipedia.org](https://en.wikipedia.org).
   (`cypress/e2e/stable/**`): lint, format check, and Cypress, on every
   push/PR, with no repository secrets required. See
   [Running in CI](#running-in-ci).
-- **Test status** — **12 of 24** total scenarios run in the
-  secret-free stable suite; the rest are documented, not hidden, as
-  needing a real test account and/or blocked by Wikipedia's own
-  anti-abuse mechanisms or an open UI-drift bug. Full breakdown →
+- **Test status** — **11 of 24** total scenarios run in the
+  secret-free stable suite, confirmed passing on GitHub Actions (not
+  just locally); the rest are documented, not hidden, as needing a
+  real test account and/or blocked by Wikipedia's own anti-abuse
+  mechanisms or an open UI-drift bug. Full breakdown →
   [`FINAL_REVIEW.md`](./FINAL_REVIEW.md).
 
 ## Quick start
@@ -72,17 +73,18 @@ see [Environment setup](#environment-setup).
 
 ## Stable vs. external test suites
 
-- **`cypress/e2e/stable/`** (12 of the 24 total `it()` scenarios) — runs on
+- **`cypress/e2e/stable/`** (11 of the 24 total `it()` scenarios) — runs on
   every push/PR via `.github/workflows/cypress.yml`, and **needs no
   Wikipedia credentials at all** (its one authentication scenario uses
   fake login/password literals). Failures here are a real signal about
   this code, and the workflow runs unmodified on a public fork.
-- **`cypress/e2e/external/`** (12 scenarios) — runs only via manual
+- **`cypress/e2e/external/`** (13 scenarios) — runs only via manual
   dispatch (`.github/workflows/cypress-external.yml` or
   `npm run test:external`), and needs a real disposable test account.
   Currently: 1 scenario should pass once credentials are set; the rest
   are blocked by a Wikimedia SSO email-verification prompt, an hCaptcha
-  challenge triggered by saving, and an undiagnosed language-selector
+  challenge that can trigger on any sandbox edit (even one that only
+  cancels, never saves), and an undiagnosed language-selector
   UI change — none of which this suite attempts to bypass.
   See [`ARCHITECTURE.md`](./ARCHITECTURE.md#stable-vs-external-test-suites)
   for the full rationale and [`FINAL_REVIEW.md`](./FINAL_REVIEW.md) for

@@ -234,6 +234,35 @@ This closes out the original request: `.github/workflows/cypress.yml`
 ("Cypress E2E (Stable)") is green on GitHub, requires no repository
 secrets, and installs cleanly via `npm ci` after a clean clone.
 
+**That "closes out" claim needed one more correction.** A follow-up
+docs-only push (identical code, `commit cdf1de6`) was still checked
+via the same authenticated monitoring, per the instruction to verify
+every push rather than assume a fix generalizes - and it **failed**:
+`editing.cy.js` "Cancels editing an article" (0 passing, 1 failing)
+with `cy.clear() failed because this element is readonly`. The
+screenshot artifact for that run shows XHR calls to
+`hcaptcha.wikimedia.org/checksiteconfig`,
+`hcaptcha.wikimedia.org/getcaptcha`, and
+`/rest.php/v0/confirmedit/hcaptcha/blocktoken` in the Cypress command
+log - the same anti-abuse challenge documented earlier for scenarios
+that _save_, except this scenario never saves; it only types into the
+editor and cancels. Almost certainly, typing alone triggers
+MediaWiki's `stashedit` autosave API, which is enough to draw the same
+scrutiny as an actual publish.
+
+This directly matches the request's own instruction 6 ("move any test
+requiring... CAPTCHA interaction... to the external/manual suite") -
+`editing.cy.js` as a whole isn't deterministic, not just its
+save-submitting scenarios. Moved the entire spec (including "Cancels
+editing an article") to `cypress/e2e/external/`; `stable/` no longer
+has any editing coverage at all. Counts: **stable 11 / external 13 /
+24 total** (was 12/12) - updated in `README.md` and `ARCHITECTURE.md`.
+
+Verified locally before pushing again: `npm run test:ci` -
+`authentication.cy.js` 1/1, `navigation.cy.js` 4/4, `search.cy.js`
+6/6, **11/11 passing**, lint and format:check clean. Pushed and
+monitored via the authenticated API - result below.
+
 ---
 
 ## Third-pass review (2026-08-06)
