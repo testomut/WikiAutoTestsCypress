@@ -60,45 +60,87 @@ the time (a generic, contentless error message), and all three were
 explicitly logged as unproven rather than asserted as fact. The actual
 log makes the real cause unambiguous.
 
-**Why local `npm ci` runs (including a genuinely fresh `git clone`
-test in the third pass) never caught this:** the runner's npm is
-`10.9.8`; this machine's global npm is `10.2.4`. npm has tightened
-`npm ci`'s lockfile-sync (`EUSAGE`) checks across recent patch
-releases - the most likely explanation for why an older npm accepted a
-lockfile a newer one correctly rejects, though this specific
-behavioral diff between exactly these two npm versions wasn't
-independently verified beyond the version numbers themselves.
+**First attempted fix (regenerate the lockfile with a plain `npm
+install`) did not work** - pushed, checked via the same authenticated
+API, and it failed again with the identical error.
+
+### The real, fully confirmed root cause
+
+Reproduced the exact failure locally with the exact npm version the
+runner uses (`npx -y npm@10.9.8 ci`, version read directly from the
+log's "Environment details" block: `node: v22.23.1`, `npm: 10.9.8`)
+against the pushed lockfile - and it passed locally, ruling out an
+npm-version explanation despite matching versions exactly. The
+deciding difference had to be something in this machine's environment
+outside the repo entirely.
+
+Checked this machine's npm configuration directly (`npm config list
+-l` and the resolved `userconfig` file) and found it: this machine's
+personal `~/.npmrc` sets `legacy-peer-deps=true` globally, unrelated
+to this repository, set at some unknown earlier point. That setting
+reverts npm to pre-v7 behavior of not auto-installing or strictly
+validating peer dependencies. `mochawesome` (pulled in by
+`cypress-mochawesome-reporter`) declares a required peer dependency on
+`mocha` (`peerDependencies: {"mocha": ">=8"}`, no
+`peerDependenciesMeta.optional`). Under this machine's legacy setting,
+every `npm install` run here silently skipped resolving that peer - so
+every lockfile this project generated on this machine, across every
+prior pass, omitted mocha's entire dependency subtree (`mocha`,
+`chokidar`, `js-yaml`, `diff`, `glob`, and ~20 more). A clean
+environment (GitHub's runner, or any contributor without that personal
+override) uses npm's actual default (`legacy-peer-deps=false`),
+auto-installs that peer, and correctly expects it in the lock file -
+hence the deterministic, 100%-reproducible mismatch every single time.
+
+This was never an npm-version difference, an OS difference, or a
+GitHub-infrastructure issue - it was this machine's own global config
+silently diverging from the project's actual requirements, masking
+itself identically on every local check for the same reason each time.
 
 ### The fix
 
-```
-rm -rf node_modules package-lock.json
-npm install   # regenerates package-lock.json from package.json, fully fresh
-rm -rf node_modules
-npm ci        # verify: does the regenerated lockfile actually satisfy npm ci's check?
-```
+1. Added `.npmrc` to the repository: `legacy-peer-deps=false`,
+   explicit. Project-level `.npmrc` takes precedence over a user's
+   personal `~/.npmrc` in npm's config resolution order, so this
+   can't be silently overridden again, on this machine or anyone
+   else's - verified with `npm config get legacy-peer-deps` returning
+   `false` inside the project directory despite the personal default
+   still being `true`.
+2. Regenerated `package-lock.json` under that corrected setting:
+   `rm -rf node_modules package-lock.json && npm install`.
 
-Regenerated lockfile: **291 packages** (down from 296/297 in the
-stale one - the extra packages were leftover residue from this
-project's own earlier `npm install --no-save js-yaml` /
-`npm uninstall js-yaml` cycles, used a few times across prior passes
-to validate workflow YAML locally; `--no-save` prevents `package.json`
-changes but does not prevent `package-lock.json` changes, and the
-uninstall evidently didn't fully revert every affected transitive
-resolution). `npm ci` now succeeds cleanly against the regenerated
-file. `package.json` itself needed zero changes - confirmed via `git
-diff package.json` showing no content difference, only the
-lockfile was ever wrong.
+Regenerated lockfile: **312 packages** (up from 291/296 in every prior
+attempt - the difference is `mocha`'s full dependency subtree, now
+correctly present). Verified with a fresh `npm ci` both with the
+setting explicit and with plain `npm ci` relying on the new project
+`.npmrc` - both succeed identically. `package.json` itself needed zero
+changes.
+
+One new, disclosed `npm audit` finding, deliberately not forced:
+correctly resolving `mocha`'s peer dependency introduced 3
+vulnerabilities (1 low, 1 moderate, 1 high) in `diff` and
+`serialize-javascript` - both pinned by `mocha`'s own `package.json`,
+not by anything this project declares directly. `mocha` is already at
+its latest release (`11.8.0`); `npm audit fix --force --dry-run`
+confirms there is no available fix path. This `mocha` package exists
+purely to satisfy `mochawesome`'s peer-dependency check - Cypress runs
+tests via its own bundled mocha internally, so this npm-installed
+copy's code is not exercised by anything this project runs. Forcing
+an `overrides` entry to a mocha-incompatible newer version was judged
+not worth the added complexity for an unexploitable, dev-tooling-only
+transitive dependency - disclosed here rather than silently accepted
+or force-overridden.
 
 ### Local validation (real output)
 
-| Check                                          | Result                                                       |
-| ---------------------------------------------- | ------------------------------------------------------------ |
-| `npm install` (lockfile regeneration)          | 291 packages, 0 vulnerabilities                              |
-| `npm ci` (fresh, against regenerated lockfile) | clean, 291 packages, 0 vulnerabilities                       |
-| `npm run lint`                                 | 0 errors                                                     |
-| `npm run format:check`                         | clean                                                        |
-| `npm run test:ci`                              | lint + format:check + stable suite, **12/12 passing**, 1m22s |
+| Check                                                | Result                                                               |
+| ---------------------------------------------------- | -------------------------------------------------------------------- |
+| `npm install` (lockfile regeneration, corrected)     | 312 packages, 3 vulnerabilities (1 low/1 moderate/1 high, see above) |
+| `npm ci` (fresh, explicit override)                  | clean, 312 packages                                                  |
+| `npm ci` (fresh, plain - project `.npmrc` in effect) | clean, 312 packages, identical result                                |
+| `npm run lint`                                       | 0 errors                                                             |
+| `npm run format:check`                               | clean                                                                |
+| `npm run test:ci`                                    | lint + format:check + stable suite, **12/12 passing**, 1m11s         |
 
 ### Items 5-8 from this request (verified still satisfied, unchanged this pass)
 
