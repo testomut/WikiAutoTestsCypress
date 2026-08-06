@@ -10,8 +10,12 @@ that keep it that way.
 git clone https://github.com/testomut/WikiAutoTestsCypress.git
 cd WikiAutoTestsCypress
 npm ci
-cp .env.example cypress.env.json   # then fill in a disposable test account
 ```
+
+The stable suite (what `npm test` and CI run) needs no credentials. If
+you're working on `cypress/e2e/external/`, also run
+`npm run setup:env` and fill in a disposable test account - see
+[`SECURITY.md`](./SECURITY.md).
 
 ## Before opening a PR
 

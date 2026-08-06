@@ -41,20 +41,20 @@ Settings → Secrets and variables → Actions → New repository secret:
 | `CYPRESS_WIKI_USERNAME` | Username of a disposable Wikipedia test account |
 | `CYPRESS_WIKI_PASSWORD` | Password for that same account                  |
 
-Both workflows read these: the default `cypress.yml` (stable suite -
-one of its scenarios needs the real username for a wrong-password
-check) and the manually-triggered `cypress-external.yml` (needs both,
-for a full login). Without them, the stable suite's
-`authentication.cy.js` scenarios fail with a clear
+Only the manually-triggered `cypress-external.yml` needs these — the
+default `cypress.yml` (stable suite) is deliberately secret-free and
+runs on every push/PR without any repository configuration. Without
+these secrets, running the external suite (manually, or via
+`npm run test:external` locally) fails with a clear
 "Missing required Cypress env var" error rather than a confusing one.
 
 ## Other recommended settings
 
 - **Branch protection on `master`**: require the `Cypress E2E
-(Stable)` status check to pass before merging, once the workflow has
-  run successfully at least once with secrets configured. Do not
-  require the external workflow's check — it's expected to fail for
-  reasons outside this repo's control (see
+(Stable)` status check to pass before merging - it needs no secrets,
+  so this works immediately, with no setup step first. Do not require
+  the external workflow's check — it's expected to fail for reasons
+  outside this repo's control (see
   [`cypress-external.yml`](./.github/workflows/cypress-external.yml)).
 - **Running the external suite**: Actions tab → "Cypress External
   Suite (manual)" → Run workflow. Use it to check whether Wikipedia's

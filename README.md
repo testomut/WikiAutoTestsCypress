@@ -13,7 +13,7 @@ end-to-end against the live [en.wikipedia.org](https://en.wikipedia.org).
 > Started in 2024 as a short technical assignment; reworked into a
 > Senior SDET **portfolio/reference project** — see
 > [`AUDIT.md`](./AUDIT.md) and [`FINAL_REVIEW.md`](./FINAL_REVIEW.md)
-> for the two audit-driven passes this repo has been through. Not a
+> for the audit-driven passes this repo has been through. Not a
 > production test suite for a company-owned application — see
 > [`ARCHITECTURE.md`'s Limitations](./ARCHITECTURE.md#limitations-of-this-architecture).
 
@@ -30,16 +30,19 @@ end-to-end against the live [en.wikipedia.org](https://en.wikipedia.org).
 - **Key engineering decisions** — Page Object Model with zero leaked
   selectors; one reporter, not three; secrets read via `cy.env()`
   with validation, never committed; test suite split into
-  [**stable** (CI-gated) vs. **external** (manually triggered)](#stable-vs-external-test-suites)
-  so CI stays a meaningful signal. Full rationale in
-  [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+  [**stable** (CI-gated, needs no secrets) vs. **external** (manually
+  triggered, needs a real test account)](#stable-vs-external-test-suites)
+  so CI stays a meaningful signal _and_ runs unmodified on a public
+  fork. Full rationale in [`ARCHITECTURE.md`](./ARCHITECTURE.md).
 - **CI status** — the badge above is the **stable** suite only
   (`cypress/e2e/stable/**`): lint, format check, and Cypress, on every
-  push/PR. See [Running in CI](#running-in-ci).
-- **Test status** — **13 of 24** total scenarios currently pass
-  against live Wikipedia; the rest are documented, not hidden, as
-  blocked by Wikipedia's own anti-abuse mechanisms or an open UI-drift
-  bug. Full breakdown → [`FINAL_REVIEW.md`](./FINAL_REVIEW.md).
+  push/PR, with no repository secrets required. See
+  [Running in CI](#running-in-ci).
+- **Test status** — **12 of 24** total scenarios run in the
+  secret-free stable suite; the rest are documented, not hidden, as
+  needing a real test account and/or blocked by Wikipedia's own
+  anti-abuse mechanisms or an open UI-drift bug. Full breakdown →
+  [`FINAL_REVIEW.md`](./FINAL_REVIEW.md).
 
 ## Quick start
 
@@ -47,10 +50,12 @@ end-to-end against the live [en.wikipedia.org](https://en.wikipedia.org).
 git clone https://github.com/testomut/WikiAutoTestsCypress.git
 cd WikiAutoTestsCypress
 npm ci
-cp .env.example cypress.env.json   # fill in a DISPOSABLE test account - see SECURITY.md
-npm test                            # stable suite, headless
-npm run cypress:open                # or: interactive, pick a spec
+npm test                # stable suite, headless - no credentials needed
+npm run cypress:open    # or: interactive, pick a spec
 ```
+
+Running the external suite locally needs a disposable test account -
+see [Environment setup](#environment-setup).
 
 ## Commands
 
@@ -67,27 +72,37 @@ npm run cypress:open                # or: interactive, pick a spec
 
 ## Stable vs. external test suites
 
-- **`cypress/e2e/stable/`** (13 of the 24 total `it()` scenarios) — runs on
-  every push/PR via `.github/workflows/cypress.yml`. Failures here are
-  a real signal about this code.
-- **`cypress/e2e/external/`** — runs only via manual dispatch
-  (`.github/workflows/cypress-external.yml` or `npm run test:external`).
-  Currently blocked by a Wikimedia SSO email-verification prompt, an
-  hCaptcha challenge triggered by saving, and an undiagnosed language-
-  selector UI change — none of which this suite attempts to bypass.
+- **`cypress/e2e/stable/`** (12 of the 24 total `it()` scenarios) — runs on
+  every push/PR via `.github/workflows/cypress.yml`, and **needs no
+  Wikipedia credentials at all** (its one authentication scenario uses
+  fake login/password literals). Failures here are a real signal about
+  this code, and the workflow runs unmodified on a public fork.
+- **`cypress/e2e/external/`** (12 scenarios) — runs only via manual
+  dispatch (`.github/workflows/cypress-external.yml` or
+  `npm run test:external`), and needs a real disposable test account.
+  Currently: 1 scenario should pass once credentials are set; the rest
+  are blocked by a Wikimedia SSO email-verification prompt, an hCaptcha
+  challenge triggered by saving, and an undiagnosed language-selector
+  UI change — none of which this suite attempts to bypass.
   See [`ARCHITECTURE.md`](./ARCHITECTURE.md#stable-vs-external-test-suites)
   for the full rationale and [`FINAL_REVIEW.md`](./FINAL_REVIEW.md) for
   current results.
 
 ## Environment setup
 
-The authentication specs need Wikipedia credentials, read via
-`cy.env()` with explicit validation (see
+Only needed to run the **external** suite - the stable suite needs no
+credentials. Credentials are read via `cy.env()` with explicit
+validation (see
 [`ARCHITECTURE.md`](./ARCHITECTURE.md#credentials-and-the-cypress-15-env-warning)).
-Copy [`.env.example`](./.env.example) — either a gitignored
-`cypress.env.json` locally, or `CYPRESS_`-prefixed environment
-variables in CI. **Use a disposable test account you don't mind
-losing** — never a personal or production Wikipedia account. See
+
+```bash
+npm run setup:env   # creates cypress.env.json from cypress.env.example.json
+```
+
+Then fill in a **disposable test account you don't mind losing** —
+never a personal or production Wikipedia account — in the new
+`cypress.env.json` (gitignored). In CI, use `CYPRESS_`-prefixed
+repository secrets instead — see [`.env.example`](./.env.example) and
 [`SECURITY.md`](./SECURITY.md).
 
 ## Running in CI
@@ -97,12 +112,13 @@ push/PR: Node 22, dependency + Cypress-binary caching via
 [`cypress-io/github-action`](https://github.com/cypress-io/github-action)
 (see [why](./ARCHITECTURE.md#ci-caching-cypress-io-github-action-not-a-manual-cache-step)),
 lint, format check, then the suite. Videos and the Mochawesome report
-upload as artifacts on every run; screenshots upload on failure.
+upload as artifacts on every run; screenshots upload on failure. **No
+repository secrets are required** for this workflow.
 
-**Setup required:** add `CYPRESS_WIKI_USERNAME`/`CYPRESS_WIKI_PASSWORD`
-as repository secrets (Settings → Secrets and variables → Actions) —
-see [`GITHUB_SETUP.md`](./GITHUB_SETUP.md). Until then, the two
-credential-dependent stable scenarios fail predictably.
+`.github/workflows/cypress-external.yml` (manual dispatch only) runs
+the external suite and does need
+`CYPRESS_WIKI_USERNAME`/`CYPRESS_WIKI_PASSWORD` repository secrets —
+see [`GITHUB_SETUP.md`](./GITHUB_SETUP.md).
 
 ## Reports
 

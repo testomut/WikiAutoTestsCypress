@@ -5,6 +5,24 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed — Secret-free stable suite (2026-08-06)
+
+- **Stable suite needs zero repository secrets.** Moved the one
+  `authentication.cy.js` stable scenario that needed a real Wikipedia
+  username ("correct username, incorrect password") to `external/`;
+  the remaining stable scenario uses only fake login/password
+  literals. `stable/` is now 12 scenarios, `external/` is 12 (was
+  13/11) - updated everywhere this was documented.
+- Removed the now-unused `CYPRESS_WIKI_USERNAME`/`PASSWORD` `env:`
+  block from `cypress.yml`'s test step - the default workflow runs
+  unmodified on a public fork with no configuration.
+- **Fixed a broken setup instruction:** `cp .env.example
+cypress.env.json` was both Unix-only _and_ produced invalid JSON
+  (`.env.example` is dotenv-style text with comments, not JSON). Added
+  `cypress.env.example.json` (a real JSON template) and a
+  cross-platform `npm run setup:env` script that copies it without
+  overwriting an existing file.
+
 ### Changed — Second-pass focused review (2026-08-06)
 
 - **Doc consistency:** fixed `README.md`'s incorrect "19 `it()`
