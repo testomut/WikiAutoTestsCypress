@@ -5,6 +5,12 @@ name: Cypress E2E (Stable)
 # (auth email-verification, sandbox hCaptcha, language-selector drift)
 # lives in cypress-external.yml, triggered manually - see that file
 # and FINAL_REVIEW.md for why those scenarios aren't run here.
+#
+# Deliberately self-contained: no repository secrets are required.
+# Every stable scenario uses either no credentials at all, or fake
+# literal login/password values - real Wikipedia credentials are only
+# needed by cypress-external.yml. This lets the workflow run
+# unmodified on a fork or any public clone of this repo.
 
 on:
   push:
@@ -48,9 +54,6 @@ jobs:
         with:
           install: false
           spec: cypress/e2e/stable/**/*.cy.js
-        env:
-          CYPRESS_WIKI_USERNAME: ${{ secrets.CYPRESS_WIKI_USERNAME }}
-          CYPRESS_WIKI_PASSWORD: ${{ secrets.CYPRESS_WIKI_PASSWORD }}
 
       - name: Upload screenshots (on failure)
         if: failure()

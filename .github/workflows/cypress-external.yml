@@ -1,13 +1,17 @@
 name: Cypress External Suite (manual)
 
-# Runs the external/blocked suite (cypress/e2e/external/**):
-# authentication (successful login/logout), sandbox editing (saves),
-# and language switching. These are NOT run automatically on
-# push/pull_request because their outcome does not reflect this
-# codebase's quality - as of the last verification in FINAL_REVIEW.md:
+# Runs the external/blocked suite (cypress/e2e/external/**), which
+# needs real Wikipedia credentials (CYPRESS_WIKI_USERNAME/PASSWORD
+# secrets) - unlike the default cypress.yml, which is secret-free.
+# Not run automatically on push/pull_request because part of its
+# outcome does not reflect this codebase's quality - as of the last
+# verification in FINAL_REVIEW.md:
 #
-#   - authentication: blocked by a Wikimedia SSO email-verification
-#     challenge on this test account (not solved or bypassed here).
+#   - authentication: the wrong-password-with-real-username scenario
+#     should pass once secrets are set. The two successful-login/
+#     logout scenarios are blocked by a Wikimedia SSO email-
+#     verification challenge on this test account (not solved or
+#     bypassed here).
 #   - editing:         blocked by an hCaptcha challenge triggered by
 #     the first save attempt on this account (not solved or bypassed
 #     here).
