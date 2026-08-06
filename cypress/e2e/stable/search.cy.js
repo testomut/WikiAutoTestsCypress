@@ -1,5 +1,5 @@
-import WikipediaMainPage from '../pages/WikipediaMainPage';
-import { searchQueries } from '../fixtures/testData';
+import WikipediaMainPage from '../../pages/WikipediaMainPage';
+import { searchQueries } from '../../fixtures/testData';
 
 describe('Article Search', () => {
   const wikipediaMainPage = new WikipediaMainPage();

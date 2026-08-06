@@ -1,7 +1,14 @@
-import WikipediaSandboxPage from '../pages/WikipediaSandboxPage';
-import { sandboxEditText } from '../fixtures/testData';
+import WikipediaSandboxPage from '../../pages/WikipediaSandboxPage';
+import { sandboxEditText } from '../../fixtures/testData';
 
-describe('Sandbox Editing', () => {
+// EXTERNAL/BLOCKED: every scenario here submits a save. On this test
+// account, the first save attempt in a run triggers an hCaptcha
+// challenge (confirmed via the Cypress network log - see
+// FINAL_REVIEW.md), which is not solved or bypassed here, and appears
+// to gate the rest of that browser session. Not run in the default CI
+// workflow; run manually via the "Cypress External Suite" workflow or
+// `npm run test:external`.
+describe('Sandbox Editing (external - blocked)', () => {
   const sandboxPage = new WikipediaSandboxPage();
   // Unique per run so repeated executions against the shared, real
   // Wikipedia:Sandbox page don't collide with a prior run's leftover text.
@@ -16,12 +23,6 @@ describe('Sandbox Editing', () => {
     sandboxPage.typeText(sandboxEditText.withCharacters);
     sandboxPage.saveChanges(sandboxEditText.editSummary);
     sandboxPage.assertChangesSaved(sandboxEditText.withCharacters);
-  });
-
-  it('Cancels editing an article', () => {
-    sandboxPage.typeText(sandboxEditText.cancelled);
-    sandboxPage.cancelEditing();
-    sandboxPage.assertChangesCanceled(sandboxEditText.cancelled);
   });
 
   it('Edits the sandbox by adding text with numbers', () => {

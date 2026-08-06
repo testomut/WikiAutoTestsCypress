@@ -1,5 +1,5 @@
-import WikipediaMainPage from '../pages/WikipediaMainPage';
-import { navigationTargets } from '../fixtures/testData';
+import WikipediaMainPage from '../../pages/WikipediaMainPage';
+import { navigationTargets } from '../../fixtures/testData';
 
 describe('Category Navigation', () => {
   const wikipediaMainPage = new WikipediaMainPage();

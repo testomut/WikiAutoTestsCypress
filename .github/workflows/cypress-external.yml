@@ -1,0 +1,82 @@
+name: Cypress External Suite (manual)
+
+# Runs the external/blocked suite (cypress/e2e/external/**):
+# authentication (successful login/logout), sandbox editing (saves),
+# and language switching. These are NOT run automatically on
+# push/pull_request because their outcome does not reflect this
+# codebase's quality - as of the last verification in FINAL_REVIEW.md:
+#
+#   - authentication: blocked by a Wikimedia SSO email-verification
+#     challenge on this test account (not solved or bypassed here).
+#   - editing:         blocked by an hCaptcha challenge triggered by
+#     the first save attempt on this account (not solved or bypassed
+#     here).
+#   - language:        the Universal Language Selector widget's
+#     internals no longer match the expected selectors; an open,
+#     undiagnosed gap, not a guessed fix.
+#
+# Expect this workflow to fail (partially or fully) on most runs.
+# A red run here is informational - it tells you whether Wikipedia's
+# anti-abuse behavior or third-party UI has changed again - not a sign
+# this repository is broken. Trigger it manually (Actions tab ->
+# this workflow -> "Run workflow") when you want to check on that
+# drift, e.g. after rotating to a different test account.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    name: Run the external/blocked Cypress suite
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        uses: cypress-io/github-action@v7
+        with:
+          runTests: false
+
+      - name: Run external Cypress suite
+        uses: cypress-io/github-action@v7
+        with:
+          install: false
+          spec: cypress/e2e/external/**/*.cy.js
+        env:
+          CYPRESS_WIKI_USERNAME: ${{ secrets.CYPRESS_WIKI_USERNAME }}
+          CYPRESS_WIKI_PASSWORD: ${{ secrets.CYPRESS_WIKI_PASSWORD }}
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress-external-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload videos
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress-external-videos
+          path: cypress/videos
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Mochawesome report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mochawesome-external-report
+          path: cypress/reports/html
+          if-no-files-found: ignore
+          retention-days: 30

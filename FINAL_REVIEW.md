@@ -1,9 +1,104 @@
 # Final Review
 
-Date: 2026-08-05. Branch: `refactor/senior-sdet-rework` (merged into
-`master`). This document reports what was actually run and observed —
-no result below is asserted without a corresponding command output,
-screenshot, or curl trace captured during the work.
+This document reports what was actually run and observed in each
+review pass — no result below is asserted without a corresponding
+command output, screenshot, or curl trace captured during the work.
+Newest pass first.
+
+## Second-pass review (2026-08-06)
+
+Branch: `fix/second-pass-review`. Scope: a focused follow-up requested
+after the first pass below — no new broad refactor, only the specific
+items listed here.
+
+### What changed
+
+1. **Doc consistency fix** — `README.md` claimed "19 `it()` scenarios";
+   the real count (`grep -cE "^\s*it\(" cypress/e2e/**/*.cy.js`) is
+   **24**, matching what this file already reported (13/24). Fixed in
+   `README.md`; this file's count was already correct.
+2. **Split stable vs. external suites** — see
+   [`ARCHITECTURE.md`'s Stable vs. external test suites](./ARCHITECTURE.md#stable-vs-external-test-suites)
+   for the full rationale. `cypress/e2e/stable/` (13 scenarios) vs.
+   `cypress/e2e/external/` (11 scenarios); `authentication.cy.js` and
+   `editing.cy.js` were split at the `it()` level since each had a mix
+   of both.
+3. **Default CI workflow** (`cypress.yml`) now runs only
+   `cypress/e2e/stable/**` — a red run is a real signal again.
+4. **New manual workflow** (`cypress-external.yml`,
+   `workflow_dispatch` only) runs `cypress/e2e/external/**`, with the
+   anti-abuse/UI-drift caveat written directly into the workflow file,
+   not just this doc.
+5. **Fixed the Cypress 15 `allowCypressEnv` warning** — added
+   `cypress/utils/env.js`'s `requireEnv()`, which reads via `cy.env()`
+   inside a `before()` hook instead of `Cypress.env()` at the spec's
+   top level, and throws a clear error if a variable is missing. Set
+   `allowCypressEnv: false` in `cypress.config.js`. See
+   [`ARCHITECTURE.md`](./ARCHITECTURE.md#credentials-and-the-cypress-15-env-warning).
+6. **`npm run test:ci`** now runs lint, then `format:check`, then the
+   stable suite (previously skipped `format:check`).
+7. **Fixed Cypress binary caching** — the previous workflow's
+   `actions/cache` step ran _after_ `npm ci`, so it never actually
+   cached anything (verified by reading the step order, not assumed).
+   Replaced with `cypress-io/github-action@v7`, which handles
+   dependency install and both npm-cache and Cypress-binary caching
+   correctly out of the box. Full comparison in
+   [`ARCHITECTURE.md`](./ARCHITECTURE.md#ci-caching-cypress-io-github-action-not-a-manual-cache-step).
+8. **Removed the stale `docs/` report** (`git rm -r docs/`) rather than
+   relabeling it — it was a static Mochawesome report from the
+   project's original 2024 version with no auto-refresh mechanism, and
+   this repo doesn't yet auto-publish reports anywhere (still a
+   roadmap item).
+9. **Trimmed `README.md`** from ~310 to ~110 lines: the first screen
+   now shows purpose, stack, key engineering decisions, CI status, and
+   test status before quick start. Folder structure, full design-
+   decision rationale, and the detailed stability strategy moved to
+   `ARCHITECTURE.md`; test-result history stays in this file.
+
+### Validation run for real
+
+| Check                                                             | Result                                                                                                                                                                                           |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run lint`                                                    | 0 errors                                                                                                                                                                                         |
+| `npm run format:check`                                            | clean                                                                                                                                                                                            |
+| `npm audit`                                                       | 0 vulnerabilities                                                                                                                                                                                |
+| `.github/workflows/cypress.yml`, `cypress-external.yml`           | parsed successfully with `js-yaml` (installed temporarily, not committed); **not yet executed on GitHub Actions** — this file will be updated with the actual run result once pushed, not before |
+| Stable suite (`npm test`), real run against live en.wikipedia.org | **13/13 passing** (see below)                                                                                                                                                                    |
+
+**Stable suite result:** all 13 scenarios pass -
+`authentication.cy.js` 2/2, `editing.cy.js` 1/1, `navigation.cy.js`
+4/4, `search.cy.js` 6/6. Total run time 59s. No `allowCypressEnv`
+deprecation warning printed (confirmed absent by grepping the run
+output) - the `cy.env()`/`requireEnv()` fix resolved it, not just
+silenced it. First run of the split suite failed at
+`authentication.cy.js`'s `before all` hook with
+`requireEnv()`'s own error message ("Missing required Cypress env var
+WIKI_USERNAME") because the local, gitignored `cypress.env.json` was
+absent in this environment - refilled with the same disposable test
+account used throughout this project, then the rerun above passed
+clean. That failure-then-pass sequence is itself a demonstration that
+the new validation error path works as designed, not a hidden problem.
+
+External suite (`npm run test:external`) was not re-run in this pass -
+its expected-blocked status (documented in the first-pass section
+below) is unrelated to any change made here, and repeatedly exercising
+Wikipedia's anti-abuse systems isn't warranted just to reconfirm a
+known, unchanged result.
+
+### What this pass deliberately did not touch
+
+- Did not attempt to diagnose or fix `language.cy.js` — still an open
+  gap, per the first pass below, now simply relocated to `external/`.
+- Did not attempt to solve the hCaptcha or email-verification
+  challenges — same reasoning as the first pass.
+- Did not add TypeScript, a new reporter, a new abstraction layer, or
+  any dependency beyond what the 10 requested items required.
+
+---
+
+## First-pass review (2026-08-05)
+
+Branch: `refactor/senior-sdet-rework` (merged into `master`).
 
 ## What was fixed
 
