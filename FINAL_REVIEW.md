@@ -215,13 +215,24 @@ verification specifically targeted repeatability, since the whole
 point of the fix is eliminating a race that only sometimes reproduced
 locally.
 
-### What happens next
+### Third push: the public workflow is green
 
-Pushing this fix and monitoring the resulting GitHub Actions run via
-the same authenticated API access is the next step - result appended
-below once known. Per the instruction not to claim success from local
-execution alone, the workflow run's actual conclusion is what decides
-this, not the table above.
+Pushed the two stability fixes and monitored the resulting run via
+the authenticated API until it completed - run
+[31082059581](https://github.com/testomut/WikiAutoTestsCypress/actions/runs/31082059581),
+commit `3c51340`, **conclusion: `success`**. Every step succeeded:
+Checkout, Set up Node.js, Cache Cypress binary, Install dependencies,
+Lint, Check formatting, Run stable Cypress suite. The actual test
+summary from that run's own log: `authentication.cy.js` 1/1,
+`editing.cy.js` 1/1, `navigation.cy.js` 4/4, `search.cy.js` 6/6 -
+**12/12 passing**, matching every local run in this pass exactly.
+This is the actual GitHub Actions conclusion, not a local result
+presented as if it were - checked via the same authenticated API used
+throughout this investigation, not assumed.
+
+This closes out the original request: `.github/workflows/cypress.yml`
+("Cypress E2E (Stable)") is green on GitHub, requires no repository
+secrets, and installs cleanly via `npm ci` after a clean clone.
 
 ---
 
