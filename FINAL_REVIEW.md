@@ -260,8 +260,21 @@ has any editing coverage at all. Counts: **stable 11 / external 13 /
 
 Verified locally before pushing again: `npm run test:ci` -
 `authentication.cy.js` 1/1, `navigation.cy.js` 4/4, `search.cy.js`
-6/6, **11/11 passing**, lint and format:check clean. Pushed and
-monitored via the authenticated API - result below.
+6/6, **11/11 passing**, lint and format:check clean.
+
+### Fourth push: green again, with the corrected 11-scenario suite
+
+Pushed and monitored via the authenticated API until completion - run
+[31082951312](https://github.com/testomut/WikiAutoTestsCypress/actions/runs/31082951312),
+commit `4078ea0`, **conclusion: `success`**. Every step succeeded
+again (Checkout through Run stable Cypress suite). That run's own log:
+`authentication.cy.js` 1/1, `navigation.cy.js` 4/4, `search.cy.js`
+6/6 - **11/11 passing**, matching the local run exactly.
+
+This is the state the original request asked for: a public,
+`npm ci`-installable, secret-free, deterministic stable suite, green
+on the actual GitHub Actions run - checked, not assumed, at every
+step of getting here.
 
 ---
 
