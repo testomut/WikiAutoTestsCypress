@@ -1,16 +1,13 @@
-name: Cypress E2E (Stable)
+name: Cypress Smoke
 
-# Runs only the stable suite (cypress/e2e/stable/**) so this workflow
-# is a meaningful green/red quality signal. The external/blocked suite
-# (auth email-verification, sandbox hCaptcha, language-selector drift)
-# lives in cypress-external.yml, triggered manually - see that file
-# and FINAL_REVIEW.md for why those scenarios aren't run here.
+# Small, deterministic pipeline check - proves dependencies install,
+# the Cypress config works, lint/format pass, and a basic test runs.
+# It is not a Wikipedia quality gate: the broader scenario set lives
+# in cypress/e2e/examples/ as reference material, run manually via
+# cypress-examples.yml or `npm run test:examples` - see README.md and
+# ARCHITECTURE.md.
 #
-# Deliberately self-contained: no repository secrets are required.
-# Every stable scenario uses either no credentials at all, or fake
-# literal login/password values - real Wikipedia credentials are only
-# needed by cypress-external.yml. This lets the workflow run
-# unmodified on a fork or any public clone of this repo.
+# Needs no repository secrets and runs unmodified on a fork or clone.
 
 on:
   push:
@@ -19,9 +16,9 @@ on:
 
 jobs:
   test:
-    name: Lint, format check, and run the stable Cypress suite
+    name: Lint, format check, and run the smoke suite
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -33,16 +30,6 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      # Cached before `npm ci` runs, so a hit actually skips the
-      # download - see ARCHITECTURE.md "CI caching" for the two
-      # bugs this replaced: a manual actions/cache step ordered
-      # *after* npm ci (never cached anything), then
-      # cypress-io/github-action, whose install step failed 3/3 times
-      # on this repo's GitHub-hosted runners for a reason that
-      # couldn't be diagnosed without full log access. Plain `npm ci`
-      # has not failed once in any local or CI run tested so far, and
-      # a plain `run:` step prints its full output directly in the
-      # log with no extra permissions needed to read it.
       - name: Cache Cypress binary
         uses: actions/cache@v6
         with:
@@ -58,8 +45,8 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
-      - name: Run stable Cypress suite
-        run: npx cypress run --spec "cypress/e2e/stable/**/*.cy.js"
+      - name: Run smoke suite
+        run: npx cypress run --spec "cypress/e2e/smoke/**/*.cy.js"
 
       - name: Upload screenshots (on failure)
         if: failure()

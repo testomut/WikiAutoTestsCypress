@@ -12,8 +12,8 @@ cd WikiAutoTestsCypress
 npm ci
 ```
 
-The stable suite (what `npm test` and CI run) needs no credentials. If
-you're working on `cypress/e2e/external/`, also run
+The smoke suite (what `npm test` and CI run) needs no credentials. If
+you're working on `cypress/e2e/examples/`, also run
 `npm run setup:env` and fill in a disposable test account - see
 [`SECURITY.md`](./SECURITY.md).
 

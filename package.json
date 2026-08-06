@@ -1,7 +1,7 @@
 {
   "name": "wikipedia-cypress-tests",
   "version": "1.0.0",
-  "description": "Reference Cypress UI automation framework for Wikipedia: Page Object Model, CI/CD, and Mochawesome reporting.",
+  "description": "Portfolio/reference Cypress automation project exercising Wikipedia: Page Object Model, CI smoke suite, and Mochawesome reporting.",
   "keywords": [
     "cypress",
     "test-automation",
@@ -25,13 +25,13 @@
     "pretest": "npm run clean",
     "setup:env": "node -e \"const fs=require('fs');if(fs.existsSync('cypress.env.json')){console.log('cypress.env.json already exists - leaving it as is.');}else{fs.copyFileSync('cypress.env.example.json','cypress.env.json');console.log('Created cypress.env.json - fill in a disposable test account, see SECURITY.md.');}\"",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run --spec \"cypress/e2e/stable/**/*.cy.js\"",
-    "cypress:run:external": "cypress run --spec \"cypress/e2e/external/**/*.cy.js\"",
+    "cypress:run": "cypress run --spec \"cypress/e2e/smoke/**/*.cy.js\"",
+    "cypress:run:examples": "cypress run --spec \"cypress/e2e/examples/**/*.cy.js\"",
     "cypress:run:all": "cypress run",
     "test": "npm run cypress:run",
     "test:open": "npm run cypress:open",
-    "test:headed": "cypress run --spec \"cypress/e2e/stable/**/*.cy.js\" --headed",
-    "test:external": "npm run cypress:run:external",
+    "test:headed": "cypress run --spec \"cypress/e2e/smoke/**/*.cy.js\" --headed",
+    "test:examples": "npm run cypress:run:examples",
     "test:all": "npm run cypress:run:all",
     "test:ci": "npm run lint && npm run format:check && npm run cypress:run",
     "report": "node -e \"console.log('HTML report: ' + require('path').resolve('cypress/reports/html/index.html'))\""

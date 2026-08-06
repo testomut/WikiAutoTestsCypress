@@ -6,7 +6,7 @@ manually in the GitHub UI once this branch is reviewed and merged.
 ## Description
 
 ```
-Reference Cypress UI automation framework for Wikipedia with Page Objects, CI/CD, reporting and maintainable test architecture.
+Portfolio Cypress automation project for Wikipedia: Page Object Model, CI smoke suite, and reference example scenarios.
 ```
 
 ## Topics
@@ -41,25 +41,23 @@ Settings → Secrets and variables → Actions → New repository secret:
 | `CYPRESS_WIKI_USERNAME` | Username of a disposable Wikipedia test account |
 | `CYPRESS_WIKI_PASSWORD` | Password for that same account                  |
 
-Only the manually-triggered `cypress-external.yml` needs these — the
-default `cypress.yml` (stable suite) is deliberately secret-free and
+Only the manually-triggered `cypress-examples.yml` needs these — the
+default `cypress.yml` (smoke suite) is deliberately secret-free and
 runs on every push/PR without any repository configuration. Without
-these secrets, running the external suite (manually, or via
-`npm run test:external` locally) fails with a clear
+these secrets, running the example scenarios (manually, or via
+`npm run test:examples` locally) fails with a clear
 "Missing required Cypress env var" error rather than a confusing one.
 
 ## Other recommended settings
 
-- **Branch protection on `master`**: require the `Cypress E2E
-(Stable)` status check to pass before merging - it needs no secrets,
-  so this works immediately, with no setup step first. Do not require
-  the external workflow's check — it's expected to fail for reasons
-  outside this repo's control (see
-  [`cypress-external.yml`](./.github/workflows/cypress-external.yml)).
-- **Running the external suite**: Actions tab → "Cypress External
-  Suite (manual)" → Run workflow. Use it to check whether Wikipedia's
-  anti-abuse behavior or the language-selector UI has changed, not as
-  a merge gate.
+- **Branch protection on `master`**: require the `Cypress Smoke`
+  status check to pass before merging - it needs no secrets, so this
+  works immediately, with no setup step first. Do not require the
+  examples workflow's check — its outcome depends on Wikipedia's own
+  behavior, not this repo's code (see
+  [`cypress-examples.yml`](./.github/workflows/cypress-examples.yml)).
+- **Running the example scenarios**: Actions tab → "Cypress Examples
+  (manual)" → Run workflow. Not a merge gate.
 - **Social preview image**: optional; a screenshot of the Mochawesome
   report or the architecture diagram in `README.md` would work well.
 - **Pin the repository** on your GitHub profile if using it as
