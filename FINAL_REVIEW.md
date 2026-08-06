@@ -5,6 +5,20 @@ review pass — no result below is asserted without a corresponding
 command output, screenshot, or curl trace captured during the work.
 Newest pass first.
 
+## Fifth-pass review (2026-08-06) — repositioned as a portfolio project
+
+After the fourth pass got the full example suite passing on a given
+run, a plain instruction followed: stop treating "every Wikipedia
+scenario green" as the goal. Renamed `stable/`→`smoke/` and
+`external/`→`examples/`; smoke now holds only `navigation.cy.js` (the
+scenarios with the fewest moving parts) and is the only thing CI
+gates on. `search`, `authentication`, `editing`, and `language` moved
+to `examples/` as manually-run reference material - their pass/fail
+state above (fourth-pass section) stays accurate for what it tested;
+it's just no longer a CI requirement. README rewritten around that
+framing. Verified locally: `npm run test:ci` - 4/4 passing (smoke
+suite only, `navigation.cy.js`), lint and format:check clean.
+
 ## Fourth-pass review (2026-08-06) — confirmed root cause found and fixed
 
 Branch: `master` (direct). Scope: get authenticated log access, find the

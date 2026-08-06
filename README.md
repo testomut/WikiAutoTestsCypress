@@ -1,49 +1,47 @@
-# Wikipedia Cypress Test Automation Framework
+# Wikipedia Cypress Automation — Portfolio Project
 
-[![Stable Suite](https://github.com/testomut/WikiAutoTestsCypress/actions/workflows/cypress.yml/badge.svg)](https://github.com/testomut/WikiAutoTestsCypress/actions/workflows/cypress.yml)
+[![Cypress Smoke](https://github.com/testomut/WikiAutoTestsCypress/actions/workflows/cypress.yml/badge.svg)](https://github.com/testomut/WikiAutoTestsCypress/actions/workflows/cypress.yml)
 ![Cypress](https://img.shields.io/badge/Cypress-15-04C38E?logo=cypress&logoColor=white)
 ![Node](https://img.shields.io/badge/Node-%3E%3D22-339933?logo=node.js&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-A reference Cypress automation framework demonstrating scalable UI
-test architecture, reusable page abstractions, cross-platform
-execution, CI integration, and maintainable reporting — exercised
-end-to-end against the live [en.wikipedia.org](https://en.wikipedia.org).
+This is a **portfolio/reference project**: a Cypress test automation
+codebase built against [en.wikipedia.org](https://en.wikipedia.org) to
+demonstrate architecture and engineering decisions — a real Page
+Object Model, shared utilities, environment-based secrets, CI, and
+documentation that states tradeoffs rather than hiding them. It is not
+a continuous quality-monitoring tool for Wikipedia, and it doesn't try
+to be.
 
-> Started in 2024 as a short technical assignment; reworked into a
-> Senior SDET **portfolio/reference project** — see
-> [`AUDIT.md`](./AUDIT.md) and [`FINAL_REVIEW.md`](./FINAL_REVIEW.md)
-> for the audit-driven passes this repo has been through. Not a
-> production test suite for a company-owned application — see
-> [`ARCHITECTURE.md`'s Limitations](./ARCHITECTURE.md#limitations-of-this-architecture).
+Wikipedia is a real, external system outside this project's control.
+Some of the example scenarios here can be affected by Wikipedia's own
+UI changes, its login/authentication flow, rate limits, and anti-abuse
+mechanisms like CAPTCHA — none of which this project attempts to
+bypass. See [Limitations](#limitations) below.
+
+> Started in 2024 as a short technical assignment, then reworked
+> across a few passes — see [`AUDIT.md`](./AUDIT.md) and
+> [`FINAL_REVIEW.md`](./FINAL_REVIEW.md) for that history.
 
 ## At a glance
 
-- **Purpose** — exercise core Wikipedia user journeys (search,
-  navigation, language switching, authentication, editing) as a
-  demonstration of maintainable Cypress architecture: real Page
-  Object Model, shared utilities, environment-based secrets, CI gates,
-  and documentation that states tradeoffs rather than hiding them.
+- **Purpose** — show how a maintainable Cypress suite is put together:
+  Page Object Model, shared DOM helpers instead of copy-pasted
+  workarounds, environment-based secrets, linting/CI, and honest
+  documentation about what does and doesn't work reliably.
 - **Stack** — Cypress 15 · JavaScript + JSDoc (no TypeScript — see
   [why](./ARCHITECTURE.md#why-not-typescript)) · `cypress-mochawesome-reporter`
   · ESLint (flat config) + Prettier · GitHub Actions.
 - **Key engineering decisions** — Page Object Model with zero leaked
-  selectors; one reporter, not three; secrets read via `cy.env()`
-  with validation, never committed; test suite split into
-  [**stable** (CI-gated, needs no secrets) vs. **external** (manually
-  triggered, needs a real test account)](#stable-vs-external-test-suites)
-  so CI stays a meaningful signal _and_ runs unmodified on a public
-  fork. Full rationale in [`ARCHITECTURE.md`](./ARCHITECTURE.md).
-- **CI status** — the badge above is the **stable** suite only
-  (`cypress/e2e/stable/**`): lint, format check, and Cypress, on every
-  push/PR, with no repository secrets required. See
-  [Running in CI](#running-in-ci).
-- **Test status** — **11 of 24** total scenarios run in the
-  secret-free stable suite, confirmed passing on GitHub Actions (not
-  just locally); the rest are documented, not hidden, as needing a
-  real test account and/or blocked by Wikipedia's own anti-abuse
-  mechanisms or an open UI-drift bug. Full breakdown →
-  [`FINAL_REVIEW.md`](./FINAL_REVIEW.md).
+  selectors; one reporter, not three; secrets read via `cy.env()` with
+  validation, never committed; the suite split into a tiny
+  [**smoke** suite (CI-gated) and **examples** (manual reference)](#smoke-vs-example-scenarios)
+  so CI proves the pipeline works without depending on Wikipedia
+  staying consistently green. Full rationale in
+  [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+- **CI** — the badge above is the smoke suite only: it installs
+  dependencies, checks lint/formatting, and runs a handful of
+  deterministic tests. It's meant to stay green.
 
 ## Quick start
 
@@ -51,48 +49,47 @@ end-to-end against the live [en.wikipedia.org](https://en.wikipedia.org).
 git clone https://github.com/testomut/WikiAutoTestsCypress.git
 cd WikiAutoTestsCypress
 npm ci
-npm test                # stable suite, headless - no credentials needed
+npm test                # smoke suite, headless - no credentials needed
 npm run cypress:open    # or: interactive, pick a spec
 ```
 
-Running the external suite locally needs a disposable test account -
-see [Environment setup](#environment-setup).
+Running the example scenarios locally needs a disposable test account
+— see [Environment setup](#environment-setup).
 
 ## Commands
 
-| Command                           | What it does                                           |
-| --------------------------------- | ------------------------------------------------------ |
-| `npm test`                        | Stable suite, headless (cleans previous reports first) |
-| `npm run cypress:open`            | Open the Cypress GUI runner (any spec)                 |
-| `npm run test:external`           | External/blocked suite — see below                     |
-| `npm run test:all`                | Every spec, stable + external                          |
-| `npm run test:ci`                 | Lint + format check + stable suite — what CI runs      |
-| `npm run lint` / `lint:fix`       | ESLint                                                 |
-| `npm run format` / `format:check` | Prettier                                               |
-| `npm run report`                  | Print the generated Mochawesome HTML report path       |
+| Command                           | What it does                                          |
+| --------------------------------- | ----------------------------------------------------- |
+| `npm test`                        | Smoke suite, headless (cleans previous reports first) |
+| `npm run cypress:open`            | Open the Cypress GUI runner (any spec)                |
+| `npm run test:examples`           | Example scenarios — see below                         |
+| `npm run test:all`                | Every spec, smoke + examples                          |
+| `npm run test:ci`                 | Lint + format check + smoke suite — what CI runs      |
+| `npm run lint` / `lint:fix`       | ESLint                                                |
+| `npm run format` / `format:check` | Prettier                                              |
+| `npm run report`                  | Print the generated Mochawesome HTML report path      |
 
-## Stable vs. external test suites
+## Smoke vs. example scenarios
 
-- **`cypress/e2e/stable/`** (11 of the 24 total `it()` scenarios) — runs on
-  every push/PR via `.github/workflows/cypress.yml`, and **needs no
-  Wikipedia credentials at all** (its one authentication scenario uses
-  fake login/password literals). Failures here are a real signal about
-  this code, and the workflow runs unmodified on a public fork.
-- **`cypress/e2e/external/`** (13 scenarios) — runs only via manual
-  dispatch (`.github/workflows/cypress-external.yml` or
-  `npm run test:external`), and needs a real disposable test account.
-  Currently: 1 scenario should pass once credentials are set; the rest
-  are blocked by a Wikimedia SSO email-verification prompt, an hCaptcha
-  challenge that can trigger on any sandbox edit (even one that only
-  cancels, never saves), and an undiagnosed language-selector
-  UI change — none of which this suite attempts to bypass.
-  See [`ARCHITECTURE.md`](./ARCHITECTURE.md#stable-vs-external-test-suites)
-  for the full rationale and [`FINAL_REVIEW.md`](./FINAL_REVIEW.md) for
-  current results.
+- **`cypress/e2e/smoke/`** — a small set of deterministic tests that
+  run on every push/PR. They exist to prove the pipeline itself works
+  (dependencies install, the Cypress config is valid, lint/formatting
+  pass, a real test executes end-to-end), not to monitor Wikipedia.
+  Needs no credentials.
+- **`cypress/e2e/examples/`** — the rest of the scenarios (search,
+  language switching, authentication, editing), kept as reference
+  implementations of the same Page Object Model. Run manually via
+  `npm run test:examples` or the "Cypress Examples" workflow, not on
+  every push. Some of these currently fail against the live site —
+  documented plainly in [`FINAL_REVIEW.md`](./FINAL_REVIEW.md) rather
+  than hidden or forced green.
+
+See [`ARCHITECTURE.md`](./ARCHITECTURE.md#smoke-vs-example-scenarios)
+for the full reasoning.
 
 ## Environment setup
 
-Only needed to run the **external** suite - the stable suite needs no
+Only needed for the example scenarios — the smoke suite needs no
 credentials. Credentials are read via `cy.env()` with explicit
 validation (see
 [`ARCHITECTURE.md`](./ARCHITECTURE.md#credentials-and-the-cypress-15-env-warning)).
@@ -109,15 +106,12 @@ repository secrets instead — see [`.env.example`](./.env.example) and
 
 ## Running in CI
 
-`.github/workflows/cypress.yml` runs the stable suite on every
-push/PR: Node 22, cached `npm ci`
-(see [why plain `npm ci`](./ARCHITECTURE.md#ci-caching-and-install-plain-npm-ci-not-an-action)),
-lint, format check, then the suite. Videos and the Mochawesome report
-upload as artifacts on every run; screenshots upload on failure. **No
-repository secrets are required** for this workflow.
+`.github/workflows/cypress.yml` runs the smoke suite on every
+push/PR: Node 22, cached `npm ci`, lint, format check, then a handful
+of tests. No repository secrets required.
 
-`.github/workflows/cypress-external.yml` (manual dispatch only) runs
-the external suite and does need
+`.github/workflows/cypress-examples.yml` (manual dispatch only) runs
+the example scenarios and needs
 `CYPRESS_WIKI_USERNAME`/`CYPRESS_WIKI_PASSWORD` repository secrets —
 see [`GITHUB_SETUP.md`](./GITHUB_SETUP.md).
 
@@ -128,12 +122,28 @@ merged HTML report per run at `cypress/reports/html/index.html`, with
 screenshots embedded inline. Locally: `npm test` then `npm run
 report`. In CI: download the `mochawesome-report` artifact.
 
+## Limitations
+
+- This demonstrates test architecture, not production-grade Wikipedia
+  coverage — there's no on-call rotation or SLA behind it, and it
+  isn't meant to guarantee Wikipedia's stability.
+- The example scenarios run against a live, third-party site this
+  project doesn't control. Wikipedia's own UI changes, login flow,
+  rate limiting, and anti-abuse mechanisms (CAPTCHA, email
+  verification) can all affect them, independent of anything in this
+  codebase. None of those are bypassed here.
+- No visual regression, accessibility, or performance testing —
+  functional UI coverage only.
+
+Full detail, including exactly which example scenarios currently pass
+or fail and why, is in [`FINAL_REVIEW.md`](./FINAL_REVIEW.md).
+
 ## Documentation
 
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md) — folder structure, layers,
-  design-decision rationale, stability strategy, limitations
+  design-decision rationale, stability strategy
 - [`FINAL_REVIEW.md`](./FINAL_REVIEW.md) — real test-run results,
-  what's fixed vs. blocked, roadmap
+  what's fixed vs. blocked
 - [`AUDIT.md`](./AUDIT.md) — the original pre-rework audit
 - [`SECURITY.md`](./SECURITY.md) · [`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`CHANGELOG.md`](./CHANGELOG.md) · [`GITHUB_SETUP.md`](./GITHUB_SETUP.md)
 

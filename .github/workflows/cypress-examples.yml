@@ -1,0 +1,75 @@
+name: Cypress Examples (manual)
+
+# Runs the reference example scenarios (cypress/e2e/examples/**) - not
+# part of the CI quality gate (that's cypress.yml's smoke suite).
+# These exercise more of Wikipedia's UI as implementation examples of
+# the same Page Object Model, but their outcome depends on a live
+# third-party site this project doesn't control: Wikipedia's own UI
+# changes, authentication flow, rate limits, and anti-abuse mechanisms
+# (CAPTCHA, email verification) can all affect them. See README.md and
+# ARCHITECTURE.md.
+#
+# Needs CYPRESS_WIKI_USERNAME/CYPRESS_WIKI_PASSWORD repository secrets
+# (Settings -> Secrets and variables -> Actions) - see GITHUB_SETUP.md.
+# Trigger manually: Actions tab -> this workflow -> "Run workflow".
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    name: Run the example Cypress scenarios
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run example Cypress scenarios
+        run: npx cypress run --spec "cypress/e2e/examples/**/*.cy.js"
+        env:
+          CYPRESS_WIKI_USERNAME: ${{ secrets.CYPRESS_WIKI_USERNAME }}
+          CYPRESS_WIKI_PASSWORD: ${{ secrets.CYPRESS_WIKI_PASSWORD }}
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress-examples-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload videos
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress-examples-videos
+          path: cypress/videos
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Mochawesome report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mochawesome-examples-report
+          path: cypress/reports/html
+          if-no-files-found: ignore
+          retention-days: 30

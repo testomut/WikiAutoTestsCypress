@@ -10,15 +10,15 @@ history and current pass/fail numbers.
 ```
 cypress/
   e2e/
-    stable/       # runs in the default CI workflow - reliable, code-only failures
-    external/     # runs only via manual workflow - see "Stable vs external" below
+    smoke/        # runs in the default CI workflow - see "Smoke vs example scenarios" below
+    examples/     # reference scenarios, run only via manual workflow
   pages/          # Page Object Model classes
   utils/          # Shared helpers (DOM probing, env var validation)
   fixtures/       # Static/computed test data (search terms, language codes, edit text)
   support/        # Global Cypress hooks/setup
 .github/workflows/
-  cypress.yml          # default: lint, format check, stable suite
-  cypress-external.yml # manual (workflow_dispatch): external suite
+  cypress.yml          # default: lint, format check, smoke suite
+  cypress-examples.yml # manual (workflow_dispatch): example scenarios
 cypress.config.js
 eslint.config.js
 .prettierrc
@@ -53,54 +53,36 @@ or specs:
 because some values are computed (`'a'.repeat(300)`, etc.) rather than
 static.
 
-## Stable vs. external test suites
+## Smoke vs. example scenarios
 
-A second-pass review found that this suite's pass rate depends on two
-things this codebase doesn't control: Wikimedia's per-account
+Earlier passes tried to keep every scenario green in CI, splitting
+specs into a secret-free "stable" set and a "blocked" set based on
+exactly which Wikimedia anti-abuse mechanism or credential each
+scenario needed. That chased a moving target: Wikipedia's own
 anti-abuse heuristics (an SSO email-verification prompt, an hCaptcha
-challenge triggered by saving) and a third-party UI widget's current
-markup (the language selector). Running all of that in the default CI
-workflow made every run's red/green status meaningless — a red run
-could mean "this PR broke something" or "Wikipedia's anti-abuse system
-did its job today," with no way to tell which from the badge alone.
+challenge that can trigger on typing alone, not just saving) and its
+UI internals (a Vue-hydrated search widget, a language selector) can
+change or trigger unpredictably, independent of this code. A CI badge
+that depends on a third-party site's behavior isn't a meaningful
+quality signal, and chasing it is effort spent on the wrong thing for
+a portfolio project.
 
-A closely related, second constraint applies too: this is a public
-repository, and asking every contributor or forker to configure
-Wikipedia credentials just to get a green CI signal is unnecessary
-friction and (for a portfolio project specifically) a bar most
-reviewers won't clear before giving up. So the split is on two
-combined lines - outcome depends only on this code, **and** needs no
-real credentials:
+So the split is simpler now, and doesn't try to track _why_ each
+scenario might fail:
 
-- **`cypress/e2e/stable/`** (11 scenarios) — needs no Wikipedia
-  credentials at all, and its outcome depends only on this code and
-  Wikipedia's ordinary page structure. Runs on every push/PR via
-  `.github/workflows/cypress.yml`, with no repository secrets
-  required. A red run here is a real signal, and the workflow runs
-  unmodified on a public fork or clone.
-- **`cypress/e2e/external/`** (13 scenarios) — needs a real Wikipedia
-  test account, and/or is currently blocked by the anti-abuse
-  mechanisms above or an undiagnosed UI-drift bug. Runs only on manual
-  dispatch via `.github/workflows/cypress-external.yml`. A red run
-  here is informational (drift-monitoring), not a quality gate —
-  documented directly in that workflow file and in
-  [`FINAL_REVIEW.md`](./FINAL_REVIEW.md).
-
-Where a single original spec file had a mix of both (`authentication`,
-`editing`), it was split at the `it()` level rather than moved
-wholesale. `authentication.cy.js`: its "wrong username and wrong
-password" scenario uses fake literals and needs no secret, so it's the
-only authentication scenario in `stable/`; "correct username, wrong
-password" needs the real username (to be a meaningful negative test at
-all) and moved to `external/` alongside the two successful-login/
-logout scenarios that depend on it. `editing.cy.js`: none of its
-scenarios stayed in `stable/` - a real CI run showed that even the one
-scenario that never saves ("Cancels editing an article") can still
-trigger the hCaptcha challenge (typing alone triggers MediaWiki's
-`stashedit` autosave API, which draws the same anti-abuse scrutiny as
-an actual publish), so the entire spec lives in `external/`. No new
-spec logic
-was written for this split; scenarios were relocated as-is.
+- **`cypress/e2e/smoke/`** — a small, deterministic set (currently
+  just `navigation.cy.js`, the scenarios with the fewest moving parts)
+  that runs on every push/PR via `.github/workflows/cypress.yml`. Its
+  job is to prove the pipeline works - dependencies install, the
+  Cypress config is valid, lint/formatting pass, a real test executes
+  - not to monitor Wikipedia. Needs no repository secrets.
+- **`cypress/e2e/examples/`** — everything else (`search`,
+  `authentication`, `editing`, `language`), kept as reference
+  implementations of the same Page Object Model. Run manually via
+  `.github/workflows/cypress-examples.yml` or `npm run test:examples`.
+  Current pass/fail state for each is in
+  [`FINAL_REVIEW.md`](./FINAL_REVIEW.md) - reported honestly, not
+  chased to green.
 
 ## Credentials and the Cypress 15 env warning
 
@@ -246,7 +228,7 @@ where that shows up, rather than claiming it's solved:
   string to avoid colliding with a previous run's leftover text, but
   the suite cannot control when Wikipedia itself clears that page —
   or, as found during verification, whether it challenges the save
-  with an hCaptcha (see [Stable vs. external test suites](#stable-vs-external-test-suites)).
+  with an hCaptcha (see [Smoke vs. example scenarios](#smoke-vs-example-scenarios)).
 
 ## Limitations of this architecture
 
@@ -254,10 +236,8 @@ where that shows up, rather than claiming it's solved:
   `retries.runMode = 1` — a genuine site outage will still fail the
   run, by design (retries mask _transient_ flakiness, not outages).
 - No cross-browser or mobile-viewport testing configured.
-- No `cy.session()` caching yet — not needed today since the stable
-  authentication scenarios don't complete a full login, but noted as
-  the first thing to add if a future spec needs to start from an
-  authenticated state.
-- The external suite's pass rate depends on Wikimedia account
+- No `cy.session()` caching yet — noted as the first thing to add if a
+  future spec needs to start from an authenticated state.
+- The example scenarios' pass rate depends on Wikimedia account
   reputation/anti-abuse state, which this repository cannot control
-  or predict run-to-run.
+  or predict run-to-run — see [Smoke vs. example scenarios](#smoke-vs-example-scenarios).

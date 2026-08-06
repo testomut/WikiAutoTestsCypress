@@ -5,6 +5,16 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed — Repositioned as a portfolio project (2026-08-06)
+
+Renamed `stable/`/`external/` to `smoke/`/`examples/` and shrank the
+CI-gated suite to a small, deterministic set (`navigation.cy.js`)
+whose only job is proving the pipeline works - not tracking
+Wikipedia's own stability. Everything else is a manually-run reference
+example. README rewritten to state plainly that this is a
+portfolio/reference project exercising a live third-party site, not
+continuous production coverage.
+
 ### Fixed — Confirmed CI root causes via authenticated log access (2026-08-06)
 
 - **Fixed the actual CI failure**: `package-lock.json` was out of sync
