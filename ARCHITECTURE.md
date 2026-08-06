@@ -176,13 +176,20 @@ ci` this time - the bug this whole section is about was the
   ordering, not the mechanism
 - a plain `run: npm ci` step
 
-Plain `npm ci` has not failed once, in any local run, fresh-clone run,
-or CI run tested throughout this project. It's also strictly easier to
-debug if it ever does fail: a `run:` step prints its full stdout/stderr
-directly in the log, with no extra permissions needed to read it -
-unlike a wrapped third-party action, where (as happened here) the
-actual error can be invisible without admin access. Losing the
-action's one-line convenience was worth trading for a step that's
+It's also strictly easier to debug if it ever does fail: a `run:` step
+prints its full stdout/stderr directly in the log, with no extra
+permissions needed to read it - unlike a wrapped third-party action,
+where (as happened here) the actual error was invisible without admin
+access. That transparency is exactly what confirmed the _real_ root
+cause once authenticated log access was obtained: plain `npm ci` then
+failed too, in 2 seconds, with a clear `EUSAGE`/lockfile-out-of-sync
+error that had nothing to do with `cypress-io/github-action` at all -
+see [`FINAL_REVIEW.md`](./FINAL_REVIEW.md)'s "Fourth-pass review" for
+the actual log excerpt and the fix (`package-lock.json` regeneration).
+The action removal above stands on its own merits (transparency,
+fewer moving parts) even though it turned out not to be what was
+actually broken. Losing the action's one-line convenience was worth
+trading for a step that's
 transparent when something goes wrong.
 
 ## Data management
