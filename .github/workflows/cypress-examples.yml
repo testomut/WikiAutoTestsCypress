@@ -10,7 +10,7 @@ name: Cypress Examples (manual)
 # ARCHITECTURE.md.
 #
 # Needs CYPRESS_WIKI_USERNAME/CYPRESS_WIKI_PASSWORD repository secrets
-# (Settings -> Secrets and variables -> Actions) - see GITHUB_SETUP.md.
+# (Settings -> Secrets and variables -> Actions).
 # Trigger manually: Actions tab -> this workflow -> "Run workflow".
 
 on:

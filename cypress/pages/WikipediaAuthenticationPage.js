@@ -6,14 +6,12 @@ class WikipediaAuthenticationPage {
   }
 
   /**
-   * Wikipedia now redirects the login form to Wikimedia's centralized
-   * SSO domain (auth.wikimedia.org) instead of authenticating on
-   * en.wikipedia.org directly - confirmed via the actual HTTP redirect
-   * chain while diagnosing a real test failure, not assumed.
-   * cy.origin() is required for Cypress to keep driving commands once
-   * the browser has navigated cross-origin; a successful login
+   * The login form redirects to Wikimedia's centralized SSO domain
+   * (auth.wikimedia.org) rather than authenticating on
+   * en.wikipedia.org directly, so this needs `cy.origin()` to keep
+   * driving commands across that navigation. A successful login
    * redirects back to en.wikipedia.org afterwards, so callers don't
-   * need cy.origin() themselves.
+   * need `cy.origin()` themselves.
    *
    * @param {{ login: string, password: string }} credentials
    */

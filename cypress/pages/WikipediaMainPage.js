@@ -7,35 +7,24 @@ class WikipediaMainPage {
 
   /**
    * At narrower viewports (including Cypress's default), Wikipedia's
-   * Vector 2022 skin renders the header search box collapsed behind a
-   * `.search-toggle` icon button until that toggle is clicked.
+   * Vector 2022 skin collapses the header search box behind a
+   * `.search-toggle` button until it's clicked.
    *
-   * `id="searchInput"` is *not* a reliable way to find the input in
-   * either state: it only exists on the server-rendered, pre-JS
-   * markup. Once Wikipedia's Vue-based typeahead search component
-   * hydrates - which can happen at any point after page load,
-   * including mid-test - it fully replaces that markup with its own
-   * interactive version that carries no `id` at all. `name="search"`
-   * is the one attribute present on the input in every state (static,
-   * Vue-hydrated, and the dedicated Special:Search page's own,
-   * unrelated form). Confirmed by dumping the actual post-click DOM
-   * via a throwaway diagnostic spec - not assumed - after this exact
-   * `id`-based approach caused real, reproducible failures both in CI
-   * and locally.
+   * `id="searchInput"` only exists on the server-rendered, pre-JS
+   * markup - once the Vue-based typeahead search component hydrates
+   * (which can happen mid-test), it replaces that markup with a
+   * version carrying no `id`. `name="search"` is the one attribute
+   * present in every state, including the standalone Special:Search
+   * form, so selectors key off that instead.
    *
-   * The toggle is a real `<a href="/wiki/Special:Search">` styled as
-   * a button, meant to be intercepted by Wikipedia's own client-side
-   * JS to expand the box in place; confirmed via a real CI failure
-   * that this interception can lose the race against the click on a
-   * slower runner, in which case the click falls through to a full
-   * page navigation to Special:Search instead - landing on a
-   * completely different, dedicated search form (MediaWiki's own
-   * `mw.widgets.SearchInputWidget`, `form#search`). Both outcomes are
-   * handled here rather than assumed away, since which one happens
-   * isn't controllable from the test. The submit button is scoped to
-   * `#p-search` because Vector 2022 duplicates the whole search form
-   * in the sticky header; an unscoped selector matches both and
-   * cy.click() rejects a 2-element subject.
+   * The toggle is a real link to Special:Search, meant to be
+   * intercepted by Wikipedia's own JS to expand the box in place. On
+   * a slow run that interception can lose the race and the click
+   * falls through to a full navigation to Special:Search - a
+   * different search form entirely. Both outcomes are handled here.
+   * The submit button is scoped to `#p-search` because Vector 2022
+   * duplicates the search form in the sticky header; an unscoped
+   * selector matches both and cy.click() rejects a 2-element subject.
    *
    * @param {string} term
    */
@@ -47,7 +36,7 @@ class WikipediaMainPage {
       const $input = $body.find(headerInput);
       if ($input.length === 0 || !$input.is(':visible')) {
         cy.get('#p-search .search-toggle').click();
-        // eslint-disable-next-line cypress/no-unnecessary-waiting -- gives the toggle click's outcome (in-place expand vs. real navigation) time to settle before the one-shot check below; confirmed necessary by a real CI failure caught mid-transition.
+        // eslint-disable-next-line cypress/no-unnecessary-waiting -- lets the toggle click's outcome (in-place expand vs. real navigation) settle before the one-shot check below.
         cy.wait(300);
       }
     });
@@ -93,12 +82,11 @@ class WikipediaMainPage {
   }
 
   /**
-   * Scoped to `#firstHeading` because Vector 2022 now renders a second
+   * Scoped to `#firstHeading` because Vector 2022 renders a second
    * `.mw-page-title-main` inside the sticky header's context bar for
-   * the same page title — an unscoped selector matches both and
-   * `have.text` then asserts on their concatenated text (e.g.
-   * 'Main PageMain Page'). Verified against the live markup while
-   * diagnosing a real test failure, not assumed.
+   * the same title - an unscoped selector matches both, and
+   * `have.text` would assert on their concatenated text instead
+   * (e.g. 'Main PageMain Page').
    *
    * @param {string} title
    */
@@ -121,12 +109,10 @@ class WikipediaMainPage {
   /**
    * Switches the active article language via the language menu.
    *
-   * The menu open animation gives no reliably queryable "done" state,
-   * so a single bounded wait is used to let it render before checking
-   * whether it actually opened; if not (occasionally the first click
-   * only registers a focus event), it retries once. This is a
-   * documented tradeoff, not a hidden flaky-test workaround — see
-   * ARCHITECTURE.md "Stability strategy".
+   * The menu's open animation has no reliably queryable "done" state,
+   * so a bounded wait lets it render before checking whether it
+   * actually opened; if not (occasionally the first click only
+   * registers a focus event), it retries once.
    *
    * @param {string} languageCode - e.g. 'en', 'de', 'fr', 'es', 'cy'
    * @param {boolean} [selectLanguage=true] - false to open the menu and
