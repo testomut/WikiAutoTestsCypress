@@ -5,6 +5,114 @@ review pass — no result below is asserted without a corresponding
 command output, screenshot, or curl trace captured during the work.
 Newest pass first.
 
+## Third-pass review (2026-08-06)
+
+Branch: `fix/secret-free-stable-suite`. Scope: fix the reported
+`cypress.yml` CI failure, and make the stable suite fully secret-free.
+
+### The reported CI failure: still open, not guessed at
+
+The user reported the public "Cypress E2E (Stable)" workflow failing
+at "Install dependencies" and asked for the full log to investigate
+the confirmed root cause - but the message that arrived still
+contained the literal placeholder text (`[PASTE THE FULL INSTALL
+DEPENDENCIES LOG HERE]`), not real log content. Before asking for it
+again, this pass tried independently to retrieve the real error:
+
+- Re-checked the run via the GitHub REST API: `.github/workflows/cypress.yml`
+  run [31077078234](https://github.com/testomut/WikiAutoTestsCypress/actions/runs/31077078234)
+  failed at "Install dependencies", `npm` exit code 1, ~3-9s - same
+  shape as the run found in the second pass.
+- The check-run annotation (available without admin auth) contains
+  only `The process '.../npm' failed with exit code 1` - no `npm ERR!`
+  text or other detail.
+- Compared that exact message against `cypress-io/github-action`'s own
+  issue tracker: the identical generic wrapper string appears on
+  issue [#854](https://github.com/cypress-io/github-action/issues/854),
+  for a completely unrelated project/failure - confirming this is
+  GitHub Actions' generic "a step's process exited non-zero" message,
+  not a Cypress- or npm-specific error description. It is not, by
+  itself, evidence of any particular cause.
+- Full job log download requires repo-admin authentication (`403` from
+  the API, confirmed again in this pass); the public run page doesn't
+  render the underlying npm output without signing in.
+
+**Conclusion: the actual root cause is still unknown**, because the
+one piece of evidence that would show it - the real npm error output -
+has not been provided and can't be retrieved from this environment.
+Per the explicit instruction not to guess a transient-download
+explanation without proof, no fix was attempted for this specific
+failure in this pass. Whoever has repo-admin access should open
+the failed run's full log and share the `npm ERR!` lines (or the
+equivalent output) so the actual cause can be diagnosed.
+
+### What was fixed (independent of the above)
+
+1. **Stable suite is now fully secret-free.** `authentication.cy.js`'s
+   stable scenario ("wrong username, wrong password") only ever used
+   fake literals; its sibling scenario ("correct username, wrong
+   password") needed the real `WIKI_USERNAME` and has moved to
+   `external/authentication.cy.js`, alongside the two successful-
+   login/logout scenarios that already needed both credentials.
+   `stable/` is now **12** scenarios (was 13), `external/` is now
+   **12** (was 11) - still 24 total. Updated in `README.md`,
+   `ARCHITECTURE.md`, `GITHUB_SETUP.md`, `CONTRIBUTING.md`,
+   `CHANGELOG.md`.
+2. **Removed the secrets `env:` block from `cypress.yml`** - the
+   default workflow reads no repository secrets at all now, so it runs
+   unmodified on any public fork or clone. Confirmed by re-reading the
+   updated file: no `secrets.` reference remains in `cypress.yml`.
+3. **No silent skipping.** `requireEnv()` (unchanged from the second
+   pass) still throws a clear, named error when a credential is
+   missing rather than skipping a test - this pass didn't touch that
+   behavior, only reduced how many scenarios need it at all.
+4. **Fixed a genuinely broken setup instruction**, not just a
+   Unix-only one: `cp .env.example cypress.env.json` copied a
+   dotenv-style file (comments, `KEY=value` lines) into a filename
+   Cypress expects to be JSON - the result would have failed to parse
+   regardless of OS. Added `cypress.env.example.json` (real JSON,
+   verified by round-tripping it through `JSON.parse()` in an isolated
+   temp directory) and a cross-platform `npm run setup:env` script
+   that copies it only if `cypress.env.json` doesn't already exist.
+
+### A regression noticed while investigating (not fixed - out of reach from this environment)
+
+Checking recent workflow runs for the reported failure also surfaced a
+separate one: GitHub's own **"pages build and deployment"** workflow
+has been failing since the commit that removed `docs/` in the second
+pass. That folder was very likely configured as this repository's
+GitHub Pages source (Settings → Pages → "Deploy from a branch" →
+`/docs`) - a setting that lives in repository configuration, not in
+any file this environment can edit. Whoever has repo-admin access
+should either point Pages at a different source/disable it, or
+restore a `docs/` folder, in GitHub's Settings UI.
+
+### Validation run for real
+
+| Check                                          | Result                                                               |
+| ---------------------------------------------- | -------------------------------------------------------------------- |
+| `npm run setup:env` (existing file)            | correctly detected and left the existing `cypress.env.json` alone    |
+| `npm run setup:env` (fresh, isolated temp dir) | produced valid, `JSON.parse()`-able `cypress.env.json`               |
+| `npm ci`                                       | clean install, 296 packages, 0 vulnerabilities                       |
+| `npm run test:ci`                              | **lint: 0 errors, format:check: clean, stable suite: 12/12 passing** |
+
+`npm run test:ci` ran lint → format:check → the stable suite in that
+order, exactly as the script defines. All 4 stable spec files passed:
+`authentication.cy.js` 1/1, `editing.cy.js` 1/1, `navigation.cy.js`
+4/4, `search.cy.js` 6/6, total runtime 1m07s. Notably, this run did
+not need `cypress.env.json` to exist at all - confirms the stable
+suite really is credential-free now, not just in theory.
+
+### What this pass deliberately did not touch
+
+- Did not fix or guess at the `cypress.yml` install-step failure -
+  see above.
+- Did not touch `language.cy.js`, the hCaptcha/email-verification
+  blockers, or add any new dependency/abstraction - out of scope per
+  the request.
+
+---
+
 ## Second-pass review (2026-08-06)
 
 Branch: `fix/second-pass-review`. Scope: a focused follow-up requested

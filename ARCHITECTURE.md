@@ -64,25 +64,37 @@ workflow made every run's red/green status meaningless — a red run
 could mean "this PR broke something" or "Wikipedia's anti-abuse system
 did its job today," with no way to tell which from the badge alone.
 
-The suite is split on that exact line:
+A closely related, second constraint applies too: this is a public
+repository, and asking every contributor or forker to configure
+Wikipedia credentials just to get a green CI signal is unnecessary
+friction and (for a portfolio project specifically) a bar most
+reviewers won't clear before giving up. So the split is on two
+combined lines - outcome depends only on this code, **and** needs no
+real credentials:
 
-- **`cypress/e2e/stable/`** — scenarios whose outcome depends only on
-  this code and Wikipedia's ordinary page structure. Runs on every
-  push/PR via `.github/workflows/cypress.yml`. A red run here is a
-  real signal.
-- **`cypress/e2e/external/`** — scenarios that are currently blocked by
-  the mechanisms above, or by an undiagnosed UI-drift bug. Runs only
-  on manual dispatch via `.github/workflows/cypress-external.yml`. A
-  red run here is informational (drift-monitoring), not a quality
-  gate — documented directly in that workflow file and in
+- **`cypress/e2e/stable/`** (12 scenarios) — needs no Wikipedia
+  credentials at all, and its outcome depends only on this code and
+  Wikipedia's ordinary page structure. Runs on every push/PR via
+  `.github/workflows/cypress.yml`, with no repository secrets
+  required. A red run here is a real signal, and the workflow runs
+  unmodified on a public fork or clone.
+- **`cypress/e2e/external/`** (12 scenarios) — needs a real Wikipedia
+  test account, and/or is currently blocked by the anti-abuse
+  mechanisms above or an undiagnosed UI-drift bug. Runs only on manual
+  dispatch via `.github/workflows/cypress-external.yml`. A red run
+  here is informational (drift-monitoring), not a quality gate —
+  documented directly in that workflow file and in
   [`FINAL_REVIEW.md`](./FINAL_REVIEW.md).
 
 Where a single original spec file had a mix of both (`authentication`,
-`editing`), it was split at the `it()` level rather than moved wholesale
-— e.g. `authentication.cy.js`'s two negative-login scenarios don't
-depend on email verification, so they stay in `stable/`, while its two
-successful-login scenarios move to `external/`. No new spec logic was
-written for this split; scenarios were relocated as-is.
+`editing`), it was split at the `it()` level rather than moved
+wholesale. `authentication.cy.js` specifically: its "wrong username
+and wrong password" scenario uses fake literals and needs no secret,
+so it's the only authentication scenario in `stable/`; "correct
+username, wrong password" needs the real username (to be a meaningful
+negative test at all) and moved to `external/` alongside the two
+successful-login/logout scenarios that depend on it. No new spec logic
+was written for this split; scenarios were relocated as-is.
 
 ## Credentials and the Cypress 15 env warning
 

@@ -23,6 +23,7 @@
     "format:check": "prettier --check .",
     "clean": "rimraf cypress/reports cypress/screenshots cypress/videos",
     "pretest": "npm run clean",
+    "setup:env": "node -e \"const fs=require('fs');if(fs.existsSync('cypress.env.json')){console.log('cypress.env.json already exists - leaving it as is.');}else{fs.copyFileSync('cypress.env.example.json','cypress.env.json');console.log('Created cypress.env.json - fill in a disposable test account, see SECURITY.md.');}\"",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run --spec \"cypress/e2e/stable/**/*.cy.js\"",
     "cypress:run:external": "cypress run --spec \"cypress/e2e/external/**/*.cy.js\"",
