@@ -37,14 +37,36 @@ again, this pass tried independently to retrieve the real error:
   the API, confirmed again in this pass); the public run page doesn't
   render the underlying npm output without signing in.
 
-**Conclusion: the actual root cause is still unknown**, because the
-one piece of evidence that would show it - the real npm error output -
-has not been provided and can't be retrieved from this environment.
-Per the explicit instruction not to guess a transient-download
-explanation without proof, no fix was attempted for this specific
-failure in this pass. Whoever has repo-admin access should open
-the failed run's full log and share the `npm ERR!` lines (or the
-equivalent output) so the actual cause can be diagnosed.
+**The actual root cause remains unknown** - the one piece of evidence
+that would show it, the real `npm ERR!` output, has not been provided
+and can't be retrieved from this environment. No fix was guessed at
+based on that message alone.
+
+### Follow-up: evidence-based mitigation, after a third identical failure
+
+After pushing the secret-free-suite changes below and re-checking,
+`.github/workflows/cypress.yml` failed **a third time**, at the exact
+same step, with the exact same generic message (run
+[31078102900](https://github.com/testomut/WikiAutoTestsCypress/actions/runs/31078102900)).
+Three identical failures at the same step is no longer consistent with
+"probably transient" - it's evidence of something reproducible about
+running `cypress-io/github-action`'s install-only mode on this repo's
+runners specifically, even though the exact `npm` error text is still
+unknown.
+
+Given that evidence (not a guess about _why_, but a measured fact
+about _where_ the failure reliably occurs), this pass replaced
+`cypress-io/github-action` with a plain `actions/cache` (correctly
+positioned before `npm ci` this time) + `npm ci` + `npx cypress run`.
+This is a mitigation based on the action's 0-for-3 track record on
+this repo's runners vs. plain `npm ci`'s 100% success rate everywhere
+it's been tested (locally, fresh clones, and every prior CI run that
+got far enough to reach the Cypress step) - not a claim about what was
+wrong with the action internally. See
+[`ARCHITECTURE.md`](./ARCHITECTURE.md#ci-caching-and-install-plain-npm-ci-not-an-action)
+for the full writeup, including why a plain `run:` step is also easier
+to debug if it ever fails again (full output visible with no admin
+auth needed).
 
 ### What was fixed (independent of the above)
 
@@ -105,8 +127,9 @@ suite really is credential-free now, not just in theory.
 
 ### What this pass deliberately did not touch
 
-- Did not fix or guess at the `cypress.yml` install-step failure -
-  see above.
+- Did not guess at the _specific npm error_ behind the install
+  failures - the mitigation above is based on where failures
+  reliably occur, not on an assumed cause.
 - Did not touch `language.cy.js`, the hCaptcha/email-verification
   blockers, or add any new dependency/abstraction - out of scope per
   the request.

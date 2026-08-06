@@ -43,17 +43,23 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: '22'
+          cache: 'npm'
+
+      # See cypress.yml for why this is plain actions/cache + npm ci
+      # rather than cypress-io/github-action - its install step failed
+      # 3/3 times on this repo's runners for a reason full logs would
+      # be needed to diagnose.
+      - name: Cache Cypress binary
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        uses: cypress-io/github-action@v7
-        with:
-          runTests: false
+        run: npm ci
 
       - name: Run external Cypress suite
-        uses: cypress-io/github-action@v7
-        with:
-          install: false
-          spec: cypress/e2e/external/**/*.cy.js
+        run: npx cypress run --spec "cypress/e2e/external/**/*.cy.js"
         env:
           CYPRESS_WIKI_USERNAME: ${{ secrets.CYPRESS_WIKI_USERNAME }}
           CYPRESS_WIKI_PASSWORD: ${{ secrets.CYPRESS_WIKI_PASSWORD }}

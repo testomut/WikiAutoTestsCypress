@@ -31,17 +31,26 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: '22'
+          cache: 'npm'
 
-      # Installs dependencies (npm ci, detected from package-lock.json)
-      # and caches both the npm package cache and the Cypress binary -
-      # both handled by this action itself. See ARCHITECTURE.md
-      # "CI caching" for why this replaced a manual actions/cache step
-      # that was ordered after `npm ci` and never actually cached
-      # anything.
-      - name: Install dependencies
-        uses: cypress-io/github-action@v7
+      # Cached before `npm ci` runs, so a hit actually skips the
+      # download - see ARCHITECTURE.md "CI caching" for the two
+      # bugs this replaced: a manual actions/cache step ordered
+      # *after* npm ci (never cached anything), then
+      # cypress-io/github-action, whose install step failed 3/3 times
+      # on this repo's GitHub-hosted runners for a reason that
+      # couldn't be diagnosed without full log access. Plain `npm ci`
+      # has not failed once in any local or CI run tested so far, and
+      # a plain `run:` step prints its full output directly in the
+      # log with no extra permissions needed to read it.
+      - name: Cache Cypress binary
+        uses: actions/cache@v6
         with:
-          runTests: false
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Lint
         run: npm run lint
@@ -50,10 +59,7 @@ jobs:
         run: npm run format:check
 
       - name: Run stable Cypress suite
-        uses: cypress-io/github-action@v7
-        with:
-          install: false
-          spec: cypress/e2e/stable/**/*.cy.js
+        run: npx cypress run --spec "cypress/e2e/stable/**/*.cy.js"
 
       - name: Upload screenshots (on failure)
         if: failure()
