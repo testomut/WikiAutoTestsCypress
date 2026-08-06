@@ -6,6 +6,13 @@ A Cypress suite built against [en.wikipedia.org](https://en.wikipedia.org). It s
 
 Wikipedia is a live site I don't control. A small set of scenarios (navigation) run in CI and stay green — that's what proves the pipeline itself works. The rest of the scenarios (search, authentication, editing, language switching) are kept as examples of the same page object model but aren't part of the CI gate, because their outcome depends on Wikipedia's own UI, login flow, rate limits, and anti-abuse checks (CAPTCHA, email verification) — none of which this project tries to get around. See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for why.
 
+## What this project demonstrates
+
+- Page Object Model and reusable DOM helpers
+- A small deterministic Cypress smoke suite running in GitHub Actions
+- Separation between stable CI checks and external-system test examples
+- Mochawesome reporting and CI artifact collection
+
 ## Stack
 
 Cypress 15, JavaScript with JSDoc (no TypeScript at this size — see [`ARCHITECTURE.md`](./ARCHITECTURE.md#why-not-typescript)), ESLint + Prettier, GitHub Actions, `cypress-mochawesome-reporter`.

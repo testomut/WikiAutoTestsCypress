@@ -1,16 +1,10 @@
 name: Cypress Examples (manual)
 
-# Runs the reference example scenarios (cypress/e2e/examples/**) - not
-# part of the CI quality gate (that's cypress.yml's smoke suite).
-# These exercise more of Wikipedia's UI as implementation examples of
-# the same Page Object Model, but their outcome depends on a live
-# third-party site this project doesn't control: Wikipedia's own UI
-# changes, authentication flow, rate limits, and anti-abuse mechanisms
-# (CAPTCHA, email verification) can all affect them. See README.md and
-# ARCHITECTURE.md.
+# Reference example scenarios (cypress/e2e/examples/**), not part of
+# the CI gate - they depend on live Wikipedia state (UI, auth, rate
+# limits, anti-abuse), not just this code.
 #
-# Needs CYPRESS_WIKI_USERNAME/CYPRESS_WIKI_PASSWORD repository secrets
-# (Settings -> Secrets and variables -> Actions).
+# Needs CYPRESS_WIKI_USERNAME/CYPRESS_WIKI_PASSWORD repository secrets.
 # Trigger manually: Actions tab -> this workflow -> "Run workflow".
 
 on:

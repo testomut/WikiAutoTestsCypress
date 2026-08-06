@@ -1,12 +1,7 @@
 name: Cypress Smoke
 
-# Small, deterministic pipeline check - proves dependencies install,
-# the Cypress config works, lint/format pass, and a basic test runs.
-# It is not a Wikipedia quality gate: the broader scenario set lives
-# in cypress/e2e/examples/ as reference material, run manually via
-# cypress-examples.yml or `npm run test:examples` - see README.md and
-# ARCHITECTURE.md.
-#
+# Deterministic pipeline check: install, lint/format, smoke suite.
+# Not a Wikipedia quality gate - see cypress-examples.yml for that.
 # Needs no repository secrets and runs unmodified on a fork or clone.
 
 on:
