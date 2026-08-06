@@ -1,8 +1,7 @@
 name: Cypress Smoke
 
-# Deterministic pipeline check: install, lint/format, smoke suite.
-# Not a Wikipedia quality gate - see cypress-examples.yml for that.
-# Needs no repository secrets and runs unmodified on a fork or clone.
+# Credential-free smoke suite that verifies code quality,
+# Cypress configuration, and basic test execution
 
 on:
   push:
