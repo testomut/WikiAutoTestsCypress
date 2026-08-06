@@ -154,6 +154,67 @@ everywhere per the third pass; `npm run setup:env` already replaced
 the broken Unix-only `cp` instruction. No spec files changed in this
 pass - only `package-lock.json`.
 
+### Second push: dependency install fixed, two real test-stability bugs surfaced
+
+Pushed the lockfile fix and monitored the resulting run via the
+authenticated API. Progress: `Install dependencies`, `Lint`, and
+`Check formatting` all **succeeded** - the root-cause fix above is
+confirmed correct. But `Run stable Cypress suite` then **failed**,
+12 tests / 7 passing / 5 failing, after running ~3 minutes (compare:
+every prior failure happened in 2-9 seconds - this is qualitatively
+different, and a good sign the real blocker was cleared).
+
+Downloaded the screenshot artifacts via the authenticated API
+(`actions/artifacts/{id}/zip`) to see the actual failures rather than
+guess from the error text alone:
+
+1. **`editing.cy.js` "Cancels editing an article"** -
+   `cy.type() failed because the center of this element is hidden
+from view` on the sandbox textarea. The screenshot shows Wikipedia's
+   "Welcome to Wikipedia" onboarding dialog still covering the
+   textarea. Root cause: `clickThenDismissOptionalDialog()`'s
+   dialog-presence check is a one-shot DOM snapshot with no retry: it
+   ran _before_ the dialog had rendered on this run's timing, found
+   nothing to dismiss, and the dialog then appeared moments later and
+   blocked the next interaction. **Fix:** added a short bounded wait
+   before that snapshot check (`cypress/utils/dom.js`).
+
+2. **`search.cy.js`, 4 of 6 scenarios** -
+   `Expected to find element: #searchInput, but never found it`. The
+   screenshot shows the header search box clearly expanded and visible
+   - yet the selector matched nothing. Rather than guess again, wrote
+     a throwaway diagnostic Cypress spec (visit the page, click the
+     toggle, dump `#p-search`'s actual `outerHTML` to a file) to get
+     ground truth. It showed the real cause: `id="searchInput"` only
+     exists on Wikipedia's server-rendered, pre-JS markup. Once its
+     Vue-based typeahead search component hydrates - which can happen at
+     any point after page load, including mid-test - it fully replaces
+     that markup with an interactive version carrying **no `id` at
+     all**. Only `name="search"` is present in every state (static,
+     Vue-hydrated, and the separate `Special:Search` page's own,
+     unrelated form). This means the `id`-based selector this suite has
+     used since long before this review was never fully reliable - it
+     happened to work often enough in earlier local/CI runs purely by
+     timing luck (catching the page before Vue's hydration completed).
+     **Fix:** `WikipediaMainPage.searchFor()` rewritten to key off
+     `#p-search input[name="search"]` instead of `#searchInput`,
+     combined with the existing Special:Search-navigation-race handling
+     from the same investigation.
+
+Also folded in, from the same diagnostic pass: the toggle-click can
+still fall through to a real navigation to `Special:Search` (a race
+in Wikipedia's own client-side JS interception of that click, not
+something this suite controls) instead of expanding the box in place
+
+- both outcomes are now handled explicitly rather than assumed away.
+
+**Verified before pushing again**, not just once: `search.cy.js` run
+3 times back-to-back locally (6/6 passing, 0 retries needed, every
+time) plus a full `npm run test:ci` (12/12 passing). This time the
+verification specifically targeted repeatability, since the whole
+point of the fix is eliminating a race that only sometimes reproduced
+locally.
+
 ### What happens next
 
 Pushing this fix and monitoring the resulting GitHub Actions run via

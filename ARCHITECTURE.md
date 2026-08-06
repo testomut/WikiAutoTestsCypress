@@ -210,10 +210,23 @@ Tests against a live, third-party, real-world site cannot be made
 fully deterministic — this section is intentionally specific about
 where that shows up, rather than claiming it's solved:
 
-- **One remaining fixed wait.** `WikipediaMainPage.switchLanguage()`
-  has one `cy.wait(500)`, inline-commented and lint-suppressed with a
-  reason: the language menu's open animation has no queryable "done"
-  state (no class flip, no event) to assert on instead.
+- **A small number of fixed waits**, each inline-commented and
+  lint-suppressed with a reason, used only where no queryable "done"
+  state exists to assert on instead: `switchLanguage()`'s menu-open
+  animation; `clickThenDismissOptionalDialog()`'s one-shot check for
+  whether an optional dialog rendered (a real CI failure showed this
+  check can otherwise run before the dialog mounts); `searchFor()`'s
+  settle time after the search-toggle click, which can either expand
+  the box in place or fall through to a real page navigation.
+- **Prefer stable attributes over `id` for Wikipedia's Vue-hydrated
+  widgets.** `searchFor()` used to key off `id="searchInput"`, which
+  only exists on the server-rendered, pre-JS markup - once Wikipedia's
+  Vue-based typeahead search component hydrates (which can happen at
+  any point after page load, including mid-test), it replaces that
+  markup with an interactive version carrying no `id` at all. Only
+  `name="search"` survives every state. Confirmed by dumping the
+  actual post-interaction DOM via a throwaway diagnostic spec, not
+  assumed - see `FINAL_REVIEW.md`.
 - **Assertions on exact MediaWiki copy**, where wording is literally
   part of what's being verified (e.g. `verifyFailedLogin()`). Where a
   structural alternative existed (asserting the URL stays on the login

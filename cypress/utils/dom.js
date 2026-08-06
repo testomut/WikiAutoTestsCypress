@@ -17,12 +17,23 @@
  * welcome dialog). If it never appears, this resolves without failing
  * the test — the dialog is optional by design.
  *
+ * The presence check itself is a one-shot DOM snapshot (Cypress's
+ * `.then()` does not retry), so a short bounded wait runs first to
+ * give the dialog a chance to actually mount before that snapshot is
+ * taken - confirmed necessary by a real CI failure: on a slower
+ * runner, the snapshot ran before the dialog rendered, missed it, and
+ * the dialog then appeared moments later and blocked the next
+ * interaction. Not fully eliminable the same way the module docblock
+ * already explains for the render-completion side of this problem.
+ *
  * @param {string} triggerSelector - selector to click to open the dialog
  * @param {string} actionSelector - selector to click inside the dialog, if present
- * @param {number} [timeoutMs=1000] - bounded wait for the optional dialog to render
+ * @param {number} [timeoutMs=2000] - bounded wait for the optional dialog to render and become visible
  */
-export function clickThenDismissOptionalDialog(triggerSelector, actionSelector, timeoutMs = 1000) {
+export function clickThenDismissOptionalDialog(triggerSelector, actionSelector, timeoutMs = 2000) {
   cy.get(triggerSelector).click();
+  // eslint-disable-next-line cypress/no-unnecessary-waiting -- see docblock above: the existence check below is a one-shot snapshot with no retry, so it needs the dialog to have already mounted.
+  cy.wait(500);
   cy.get('body').then(($body) => {
     if ($body.find(actionSelector).length > 0) {
       cy.get(actionSelector, { timeout: timeoutMs }).should('be.visible').click();
