@@ -57,13 +57,13 @@ items listed here.
 
 ### Validation run for real
 
-| Check                                                             | Result                                                                                                                                                                                           |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `npm run lint`                                                    | 0 errors                                                                                                                                                                                         |
-| `npm run format:check`                                            | clean                                                                                                                                                                                            |
-| `npm audit`                                                       | 0 vulnerabilities                                                                                                                                                                                |
-| `.github/workflows/cypress.yml`, `cypress-external.yml`           | parsed successfully with `js-yaml` (installed temporarily, not committed); **not yet executed on GitHub Actions** — this file will be updated with the actual run result once pushed, not before |
-| Stable suite (`npm test`), real run against live en.wikipedia.org | **13/13 passing** (see below)                                                                                                                                                                    |
+| Check                                                             | Result                                                        |
+| ----------------------------------------------------------------- | ------------------------------------------------------------- |
+| `npm run lint`                                                    | 0 errors                                                      |
+| `npm run format:check`                                            | clean                                                         |
+| `npm audit`                                                       | 0 vulnerabilities                                             |
+| Stable suite (`npm test`), real run against live en.wikipedia.org | **13/13 passing** (see below)                                 |
+| `.github/workflows/cypress.yml` on GitHub Actions                 | **Ran, failed** — see "GitHub Actions: real run result" below |
 
 **Stable suite result:** all 13 scenarios pass -
 `authentication.cy.js` 2/2, `editing.cy.js` 1/1, `navigation.cy.js`
@@ -84,6 +84,49 @@ its expected-blocked status (documented in the first-pass section
 below) is unrelated to any change made here, and repeatedly exercising
 Wikipedia's anti-abuse systems isn't warranted just to reconfirm a
 known, unchanged result.
+
+### GitHub Actions: real run result
+
+After merging to `master` and pushing, `.github/workflows/cypress.yml`
+actually ran on GitHub (run
+[31076849842](https://github.com/testomut/WikiAutoTestsCypress/actions/runs/31076849842),
+checked via the GitHub REST API, not assumed): it **failed** at the
+"Install dependencies" step (the `cypress-io/github-action` install-only
+invocation) after ~3 seconds, `npm` exit code 1. Lint, format-check, and
+the Cypress run itself never executed (skipped as a consequence).
+
+This is reported as a real, unresolved result, not glossed over:
+
+- `npm ci` succeeds cleanly on this machine against the exact same
+  `package.json`/`package-lock.json` that's committed, which rules out
+  a lockfile/dependency-resolution problem as the cause.
+- The GitHub REST API's job-log download endpoint returned
+  `403 Must have admin rights to Repository` when queried without a
+  token, and the public run page doesn't render the full step output
+  without signing in - so the underlying `npm` error text itself
+  couldn't be retrieved from this environment to confirm the exact
+  cause.
+- The most likely explanation, given `npm ci` installs cleanly
+  elsewhere: a transient failure downloading the Cypress binary during
+  `npm`'s postinstall step on the runner (a known, occasionally-flaky
+  step, unrelated to this repo's code) - but this is the most likely
+  explanation, not a confirmed one.
+
+**Not fixed in this pass.** Whoever has admin access to the repository
+should either re-run the failed job from the Actions tab (the fastest
+way to tell if it was transient) or open the full log to find the
+actual `npm` error if it fails again.
+
+### Remaining task list (second pass)
+
+- [ ] Re-run or investigate the failed `cypress.yml` run
+      (`31076849842`) - retry first to rule out a transient Cypress
+      binary download issue before assuming a real config problem.
+- [ ] Once CI runs green, add branch protection requiring the
+      "Cypress E2E (Stable)" check, per `GITHUB_SETUP.md`.
+- [ ] Everything in the first pass's own remaining task list below
+      that this pass didn't touch (`language.cy.js` diagnosis, the
+      long-lived test account question, auto-publishing reports).
 
 ### What this pass deliberately did not touch
 
