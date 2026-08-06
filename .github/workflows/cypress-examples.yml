@@ -1,11 +1,7 @@
 name: Cypress Examples (manual)
 
-# Reference example scenarios (cypress/e2e/examples/**), not part of
-# the CI gate - they depend on live Wikipedia state (UI, auth, rate
-# limits, anti-abuse), not just this code.
-#
-# Needs CYPRESS_WIKI_USERNAME/CYPRESS_WIKI_PASSWORD repository secrets.
-# Trigger manually: Actions tab -> this workflow -> "Run workflow".
+# Manual examples against live Wikipedia.
+# Results may be affected by authentication, rate limits, or UI changes.
 
 on:
   workflow_dispatch: {}
