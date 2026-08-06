@@ -34,15 +34,15 @@ cypress/
 
 ## Commands
 
-| Command | What it does |
-| --- | --- |
-| `npm test` | Smoke suite, headless |
-| `npm run cypress:open` | Interactive runner |
-| `npm run test:examples` | Example scenarios (needs credentials, see below) |
-| `npm run test:all` | Everything |
-| `npm run test:ci` | Lint + format check + smoke suite, what CI runs |
-| `npm run lint`, `npm run format` | ESLint / Prettier |
-| `npm run report` | Print the path to the generated HTML report |
+| Command                          | What it does                                     |
+| -------------------------------- | ------------------------------------------------ |
+| `npm test`                       | Smoke suite, headless                            |
+| `npm run cypress:open`           | Interactive runner                               |
+| `npm run test:examples`          | Example scenarios (needs credentials, see below) |
+| `npm run test:all`               | Everything                                       |
+| `npm run test:ci`                | Lint + format check + smoke suite, what CI runs  |
+| `npm run lint`, `npm run format` | ESLint / Prettier                                |
+| `npm run report`                 | Print the path to the generated HTML report      |
 
 ## Credentials
 
