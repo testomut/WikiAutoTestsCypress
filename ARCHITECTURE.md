@@ -143,7 +143,7 @@ embeds screenshots into a single HTML report via its own
 `before:run`/`after:run` hooks, so the merge/generate scripts were
 removed entirely rather than fixed.
 
-## CI caching: cypress-io/github-action, not a manual cache step
+## CI caching and install: plain `npm ci`, not an action
 
 The first version of `.github/workflows/cypress.yml` added a Cypress
 binary cache step (`actions/cache` on `~/.cache/Cypress`) **after**
@@ -152,26 +152,38 @@ ci`'s postinstall had already downloaded the binary, so the cache was
 restored too late to skip anything on that run, and (being positioned
 after the point of use) never actually sped up a subsequent run either.
 
-Two ways to fix this were considered:
+The second attempt replaced the manual cache step with the official
+[`cypress-io/github-action`](https://github.com/cypress-io/github-action),
+which installs dependencies and caches both the npm package cache and
+the Cypress binary itself as part of what it does. On paper this was
+the simpler option - one less thing to get the ordering right on. In
+practice, its install-only invocation (`runTests: false`) **failed
+3 out of 3 times** on this repo's actual GitHub-hosted runners, always
+at the same step, with GitHub Actions' generic
+`The process '.../npm' failed with exit code 1` - which carries no
+diagnostic detail on its own (confirmed by finding the identical
+string on an unrelated `cypress-io/github-action` issue for a
+different failure entirely). Full job logs require repo-admin
+authentication this environment didn't have, so the actual underlying
+`npm` error was never seen.
 
-1. **Move the manual cache step before `npm ci`.** Keeps the workflow
-   structurally the same, but still requires us to own the cache key,
-   the path, and correctness of the ordering — the exact class of bug
-   that caused this in the first place.
-2. **Use the official [`cypress-io/github-action`](https://github.com/cypress-io/github-action).**
-   It installs dependencies (detecting `package-lock.json` → `npm ci`)
-   and caches both the npm package cache and the Cypress binary
-   itself, correctly ordered, as part of what the action does — one
-   less thing this repo has to get right.
+Rather than keep guessing at a black box, the workflow now uses:
 
-Option 2 was chosen as the simpler, more maintainable one: it deletes
-the manual cache step entirely rather than just fixing its position.
-The workflow still uses `actions/setup-node` to pin Node 22 explicitly
-(the action doesn't manage Node version itself), then
-`cypress-io/github-action` twice — once with `runTests: false` to
-install/cache, once with `install: false` to run a specific `spec`
-pattern — so lint/format-check can run in between using the
-already-installed `node_modules` without a second install.
+- `actions/setup-node` with `cache: 'npm'` (pins Node 22, caches npm's
+  own download cache)
+- `actions/cache` on `~/.cache/Cypress`, positioned **before** `npm
+ci` this time - the bug this whole section is about was the
+  ordering, not the mechanism
+- a plain `run: npm ci` step
+
+Plain `npm ci` has not failed once, in any local run, fresh-clone run,
+or CI run tested throughout this project. It's also strictly easier to
+debug if it ever does fail: a `run:` step prints its full stdout/stderr
+directly in the log, with no extra permissions needed to read it -
+unlike a wrapped third-party action, where (as happened here) the
+actual error can be invisible without admin access. Losing the
+action's one-line convenience was worth trading for a step that's
+transparent when something goes wrong.
 
 ## Data management
 

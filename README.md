@@ -108,9 +108,8 @@ repository secrets instead — see [`.env.example`](./.env.example) and
 ## Running in CI
 
 `.github/workflows/cypress.yml` runs the stable suite on every
-push/PR: Node 22, dependency + Cypress-binary caching via
-[`cypress-io/github-action`](https://github.com/cypress-io/github-action)
-(see [why](./ARCHITECTURE.md#ci-caching-cypress-io-github-action-not-a-manual-cache-step)),
+push/PR: Node 22, cached `npm ci`
+(see [why plain `npm ci`](./ARCHITECTURE.md#ci-caching-and-install-plain-npm-ci-not-an-action)),
 lint, format check, then the suite. Videos and the Mochawesome report
 upload as artifacts on every run; screenshots upload on failure. **No
 repository secrets are required** for this workflow.
